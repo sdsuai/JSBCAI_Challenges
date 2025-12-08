@@ -376,14 +376,3 @@ This proves you personally understand the materials — even if you used AI tool
 | **Tier 2 Extra Credit**      | +10    |
 
 Maximum: **100 (+10 bonus)**
-
----
-
-If you want, I can also:
-
-✅ Provide a **starter code template** with TODOs
-✅ Generate a **Jupyter Notebook version**
-✅ Add optional starter videos
-✅ Make an instructor grading sheet
-
-Just tell me!
