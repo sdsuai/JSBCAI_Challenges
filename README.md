@@ -159,13 +159,13 @@ Sessions must reload the last N turns at startup.
 
 ---
 
-# 📘 RAG Requirements (Real RAG — Not Fake)
+# 📘 RAG Requirements
 
 Your RAG pipeline must include:
 
 ### ✔ Document ingestion
 
-Use the provided sample blog + PDF (from the repository), or add additional PDFs.
+Use blog and/or PDFs.
 
 ### ✔ Chunking
 
@@ -232,7 +232,7 @@ This should:
 
 ## ✔ Streaming responses
 
-* Must be chunked, SSE, or incremental polling
+* Must be chunked, SSE (Server-Sent Events), or incremental polling
 * UI must show text appearing gradually
 
 ## ✔ Mode switching
