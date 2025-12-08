@@ -393,17 +393,3 @@ Before submitting, ensure you have:
 
 ### ✔ Optional: tool mode / eval mode / speech / multimodal
 
----
-
-# Need me to add anything?
-
-I can generate:
-
-* An architecture SVG
-* Example code skeletons (backend + UI)
-* A starter template
-* A rubric sheet for instructors
-* A project logo/banner
-
-Just tell me.
-
