@@ -7,7 +7,7 @@
 
 ## **Overview**
 
-In this project, you will use **Ultralytics YOLO** to perform:
+In this project, you will use **YOLO** (You may use Ultralytics to perform:
 
 1. **Object Detection**
 2. **Object Tracking**
