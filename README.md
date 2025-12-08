@@ -1,4 +1,4 @@
-# LLM-RAG-WebUI-integration
+# LLM-RAG-WebUI-integration Grade 2
 
 ## Important note
 * You must code in Python and/or C++.
