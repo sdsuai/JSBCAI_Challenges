@@ -20,3 +20,4 @@
 ## 5. Submit Your Results
 - Once completed, take a screenshot of your final score/report
 - Submit the screenshot
+![Alt text](https://external-preview.redd.it/j73OxXDGWNLPM0GfwGzHhmFPPfoQIp-wQA_5_SJBpBc.jpg?width=640&crop=smart&auto=webp&s=cae9b65d75df809ac187c5d3ace87be02ddcb117)
