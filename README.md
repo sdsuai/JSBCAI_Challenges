@@ -1,5 +1,13 @@
 # LLM-RAG-WebUI-integration Grade 1
 
+## Name and Email:
+* Aaron Cayanan
+* acayanan1059@sdsu.edu
+* aaroncayanan02@gmail.com (GitHub)
+
+# Details
+I sent an invite to my private repo to (philipamadasun1@gmail.com). My video submission is uploaded on the GitHub.
+
 ## Important note
 * You must code in Python.
 * Some of the libraries and dependencies to fulfill this problem may require python version of atleast 3.8 to 3.10 I think ( I only tried Python 3.8), I don't think python 3.11 works with some dependencies. This is just my opinion, you can try out different python environments using conda or python venv. Ideally please use conda.
