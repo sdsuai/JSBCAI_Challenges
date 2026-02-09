@@ -1,5 +1,15 @@
 # LLM-RAG-WebUI-integration Grade 2
 
+
+## Name and Email:
+* Brandon Garate
+* bgarate6105@sdsu.edu
+* brandongarate177@gmail.com (GitHub)
+
+# Details
+I sent an invite to my private repo to (philipamadasun1@gmail.com). My video submission is uploaded on the GitHub.
+
+
 ## Important note
 * You must code in Python and/or C++.
 * The "bare-minimum" task can be accomplished with just CPU. If your GPU is good enough just use that though.
