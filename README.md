@@ -30,6 +30,8 @@ In this project, you will use **YOLO** (You may use Ultralytics to perform:
    * No physical robot required
    * All logic simulated through code
 
+You will also instrument your pipeline's **CPU RAM and GPU VRAM usage** and demonstrate that you understand how differently the two behave — the OS silently pages CPU memory to disk, while VRAM is yours to manage explicitly. See **Memory Management (section 4)**.
+
 You must use **your own video(s)** — either recorded by yourself or found online.
 
 You may use **any resources or tools**, including:
@@ -75,7 +77,7 @@ Your Python code must perform the following:
 Using Ultralytics YOLO:
 
 ```bash
-pip install ultralytics opencv-python numpy matplotlib
+pip install ultralytics opencv-python numpy matplotlib psutil
 ```
 
 You must:
@@ -280,7 +282,90 @@ frame, action
 
 ---
 
-# **4. Documentation (README.md Requirements)**
+# **4. Memory Management (CPU RAM vs GPU VRAM)**
+
+Your tracker pushes hundreds of video frames through a neural network — the perfect place to learn how memory *actually* behaves. The core lesson:
+
+> **CPU RAM is managed *for* you.** The OS hands out virtual address space, only backs it with physical pages when you touch them, and can silently swap pages to disk when RAM runs short. Your program doesn't crash — it slows down.
+>
+> **GPU VRAM is managed *by* you.** CUDA allocations are pinned physical memory: no paging, no swap. Exceed it and you get a hard `OutOfMemoryError`. And PyTorch's caching allocator holds onto "freed" VRAM, so `nvidia-smi` says you're using memory you thought you released — until you explicitly call `torch.cuda.empty_cache()`.
+
+> 🖥️ **No NVIDIA GPU?** C1 and C2 run fine on CPU. For C3, use Google Colab's free T4 GPU — every experiment fits in one notebook cell. Apple Silicon Mac users: also do C3 on Colab; your GPU shares *unified* memory with the CPU, which changes the story (that's the bonus question in C4).
+
+**Starter helpers in `examples/`:** `mem_monitor.py` (drop-in telemetry class for your tracking loop), `vram_vs_ram_demo.py` (a guided tour of every effect in C3 — run it before writing your own), and `watch_mem.sh` (watch any process's RAM from a second terminal). Watch the GPU from outside with `watch -n 0.5 nvidia-smi`.
+
+---
+
+## **C1 — In-app memory telemetry (required)**
+
+Instrument **your own tracking loop**. Every frame (or every N frames), record:
+
+* wall-clock time and frame index
+* **CPU:** your process's resident memory (RSS) via `psutil`
+* **GPU (if CUDA is available):** all three layers —
+  * `torch.cuda.memory_allocated()` — your live tensors
+  * `torch.cuda.memory_reserved()` — tensors **plus** PyTorch's cache
+  * used memory from `torch.cuda.mem_get_info()` — everything the driver has handed out (matches `nvidia-smi`)
+
+**Deliverables:**
+
+1. `memory_log.csv` written at the end of every run
+2. A **memory-vs-frame plot** (it sits nicely next to your distance-vs-frame plot)
+3. An end-of-run summary print: peak RSS and `torch.cuda.max_memory_allocated()`
+4. *(Nice touch for the demo video)* overlay the live numbers on your annotated output frames with `cv2.putText`
+
+---
+
+## **C2 — Make it leak, then fix it (required)**
+
+Run two controlled experiments on your longest video, with C1 telemetry running. **Note:** if your machine gets low on RAM during these, it may start swapping — everything crawls but nothing crashes. That is exactly the OS flexibility this section is about; describe it in your write-up instead of hiding it. Do **not** push it all the way to a frozen machine on purpose.
+
+### (a) `stream=False` vs `stream=True`
+
+Ultralytics' `model.track(source=...)` **without** `stream=True` returns a *list* containing a `Results` object for **every frame of the whole video**. With `stream=True` it returns a generator — one frame in memory at a time. Run your pipeline both ways and plot the two RSS curves on the same axes.
+
+In your README, explain what is actually heavy inside a `Results` object. Hint: inspect `result.orig_img` — every `Results` carries the **full decoded frame** with it. Estimate the math: `height × width × 3 bytes × number_of_frames` and compare it to what your plot shows.
+
+### (b) The reference leak
+
+Even with `stream=True`, this innocent-looking line re-creates the whole problem:
+
+```python
+all_results = []
+for result in model.track(source="input.mp4", stream=True, persist=True):
+    all_results.append(result)      # <-- pins every frame in memory forever
+```
+
+Python frees memory when the *last reference* dies. The generator lets each `result` go — your list grabs it back. Fix it the way the Part A starter code does: extract plain floats with `.cpu().numpy()` into your own small dicts, and let `result` fall out of scope.
+
+**Deliverables:** the leaky plot and the fixed plot, plus a short explanation of both mechanisms in your README.
+
+---
+
+## **C3 — The VRAM lifecycle (required — GPU or Colab)**
+
+First run `examples/vram_vs_ram_demo.py` and watch it alongside `nvidia-smi`. Then reproduce each effect in your own code or notebook, with a screenshot per stage:
+
+1. **Three numbers, three layers.** After your video finishes, print `memory_allocated()`, `memory_reserved()`, and driver-used from `mem_get_info()`, and put `nvidia-smi` next to them. Explain each layer — and why `nvidia-smi` is the biggest number (the CUDA context alone costs hundreds of MB).
+2. **Cache emptying.** `del` your model and tensors. `memory_allocated()` drops — but `memory_reserved()` doesn't, and `nvidia-smi` still shows the memory as used. Only `torch.cuda.empty_cache()` hands the cached blocks back to the driver. Show `nvidia-smi` before and after the call. Then answer: PyTorch keeps that cache *on purpose* — why would calling `empty_cache()` every frame make your tracker **slower**?
+3. **Hard OOM vs soft RAM.** Deliberately request more than the GPU has (e.g. 1.25× total VRAM), catch `torch.cuda.OutOfMemoryError`, and recover **without restarting the process**. Then request the *same size* from the CPU with `np.zeros(...)` — it "succeeds" instantly. Explain why (virtual pages exist only on paper until touched; check RSS).
+4. **Graceful degradation in your app.** Your tracker must survive a mid-run CUDA OOM: catch it, then either retry at a smaller `imgsz` or fall back to `device="cpu"` — logging the event, not dying with a traceback.
+
+---
+
+## **C4 — Write-up (required)**
+
+Answer in your README, in your own words (short and concrete beats long and vague):
+
+1. Your laptop happily runs Chrome + YOLO + Spotify with more combined "memory" than physically exists. Why can't an 8 GB GPU run two 6 GB models the same way?
+2. What exactly does `torch.cuda.empty_cache()` free — and what can it *never* free?
+3. Why does `nvidia-smi` disagree with `torch.cuda.memory_allocated()`? Name all the layers in between.
+4. "Swapping for GPUs" does exist — but **you** have to write it: moving tensors with `.cpu()` and back, or layer offloading when serving big LLMs. Why can't the driver just page VRAM to disk transparently, the way the OS does with RAM? One paragraph of your own reasoning (think: bandwidth, latency, and who knows what's needed next).
+5. *(Bonus)* Apple Silicon Macs give the GPU *unified* memory shared with the CPU. Which C3 effects would disappear there, and which would remain?
+
+---
+
+# **5. Documentation (README.md Requirements)**
 
 Your README must clearly explain:
 
@@ -306,6 +391,12 @@ Commands, examples, environment setup, etc.
 * What each action means
 * How thresholds were chosen
 
+### ✔ Memory management (Part C)
+
+* Memory-vs-frame plot, leaky vs fixed plots
+* VRAM lifecycle screenshots (allocated / reserved / `nvidia-smi`, before & after `empty_cache()`)
+* Answers to the C4 questions
+
 ### ✔ Example outputs
 
 * Plots
@@ -314,7 +405,7 @@ Commands, examples, environment setup, etc.
 
 ---
 
-# **5. Required Demo Video (3–6 Minutes)**
+# **6. Required Demo Video (4–8 Minutes)**
 
 Your demo video must:
 
@@ -340,15 +431,21 @@ You must show:
 * Debug prints
 * Example actions
 
-### D. Discuss challenges you faced
+### D. Show the memory work (Part C)
 
-### E. Explain what you learned
+* Your memory-vs-frame plot, and the leaky vs fixed comparison
+* Live: `torch.cuda.empty_cache()` with `nvidia-smi` visible side by side, showing reserved memory being handed back
+* The mid-run OOM being caught and recovered from (C3.4)
+
+### E. Discuss challenges you faced
+
+### F. Explain what you learned
 
 This proves you personally understand the materials — even if you used AI tools for help.
 
 ---
 
-# **6. Allowed & Not Allowed Resources**
+# **7. Allowed & Not Allowed Resources**
 
 ### **Allowed**
 
@@ -364,15 +461,19 @@ This proves you personally understand the materials — even if you used AI tool
 
 ---
 
-# **7. Grading Rubric**
+# **8. Grading Rubric**
 
 | Category                     | Points |
 | ---------------------------- | ------ |
 | YOLO Tracking Implementation | 30     |
 | Object Relations Computation | 30     |
 | Plots & Data Outputs         | 10     |
+| C1: In-app memory telemetry  | 10     |
+| C2: Leak experiments (stream=True, references) | 10 |
+| C3: VRAM lifecycle + OOM recovery | 10 |
+| C4: Memory write-up          | 5      |
 | Documentation (README.md)    | 15     |
 | Demo Video                   | 15     |
 | **Tier 2 Extra Credit**      | +10    |
 
-Maximum: **100 (+10 bonus)**
+Maximum: **135 (+10 bonus)**
