@@ -132,6 +132,12 @@ for frame_idx, result in enumerate(results):
     tracks.append(frame_data)
 ```
 
+A runnable version of this snippet — which also writes a per-frame `tracks.csv` — is in `examples/yolo_track_starter.py`:
+
+```
+python examples/yolo_track_starter.py your_video.mp4
+```
+
 ---
 
 ### **Part B — Object Relations Analysis**
@@ -292,7 +298,7 @@ Your tracker pushes hundreds of video frames through a neural network — the pe
 
 > 🖥️ **No NVIDIA GPU?** C1 and C2 run fine on CPU. For C3, use Google Colab's free T4 GPU — every experiment fits in one notebook cell. Apple Silicon Mac users: also do C3 on Colab; your GPU shares *unified* memory with the CPU, which changes the story (that's the bonus question in C4).
 
-**Starter helpers in `examples/`:** `mem_monitor.py` (drop-in telemetry class for your tracking loop), `vram_vs_ram_demo.py` (a guided tour of every effect in C3 — run it before writing your own), and `watch_mem.sh` (watch any process's RAM from a second terminal). Watch the GPU from outside with `watch -n 0.5 nvidia-smi`.
+**Starter helpers in `examples/`:** `yolo_track_starter.py` (runnable Part A pipeline + CSV), `mem_monitor.py` (drop-in telemetry class for your tracking loop), `vram_vs_ram_demo.py` (a guided tour of every effect in C3 — run it before writing your own), and `watch_mem.sh` (watch any process's RAM from a second terminal). An index of which example supports which requirement is in `examples/README.md`; deps are in `examples/requirements.txt`. Watch the GPU from outside with `watch -n 0.5 nvidia-smi`.
 
 ---
 

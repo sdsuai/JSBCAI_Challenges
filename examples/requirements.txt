@@ -1,0 +1,12 @@
+# Python deps for the starter examples in this folder.
+# Install:  pip install -r examples/requirements.txt
+#
+# (The GPU acts of C3 run fine on CPU-free machines too, but the VRAM
+#  experiments need an NVIDIA GPU — use Colab's free T4 if you don't have one.)
+
+ultralytics      # yolo_track_starter.py — YOLO detection + tracking
+opencv-python    # yolo_track_starter.py — frame I/O + annotated output
+numpy            # yolo_track_starter.py, vram_vs_ram_demo.py
+matplotlib       # README: distance-vs-frame + memory plots
+psutil           # mem_monitor.py — process RSS
+torch            # vram_vs_ram_demo.py — the CUDA/VRAM acts (C3)

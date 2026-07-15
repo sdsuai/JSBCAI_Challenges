@@ -1,2 +1,9 @@
 __pycache__/
 *.pyc
+
+# Model weights — don't commit these; they're downloadable / large.
+# (yolov8n.pt auto-downloads on first run; a custom-trained model can be GBs.)
+*.pt
+*.pth
+*.onnx
+*.engine

@@ -41,6 +41,11 @@ class MemoryLog:
         self.proc = psutil.Process()
         self.rows = []
         self.t0 = time.time()
+        if CUDA:
+            # max_memory_allocated() reports the peak since the CUDA context
+            # was created (which can include model loading before this object).
+            # Reset so print_peaks() reports the peak over THIS run only.
+            torch.cuda.reset_peak_memory_stats()
 
     def sample(self, tag=""):
         row = {
