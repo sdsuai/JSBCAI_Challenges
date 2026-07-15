@@ -1,6 +1,8 @@
+import sys
+import time
+
 import streamlit as st
 import requests
-import signal 
 
 def sigterm_handler(signum, frame):
     sys.exit(0)
@@ -25,15 +27,20 @@ def display_messages(messages):
 def main():
     st.title('Terminal Text Display in Word Bubbles')
 
-    displayed_messages = []
-    while True:
-        messages = fetch_messages()
-        new_messages = [msg for msg in messages if msg not in displayed_messages]
-        
-        if new_messages:
-            display_messages(new_messages)
-            displayed_messages.extend(new_messages)
-        st.rerun()
+    # st.rerun() restarts this whole script, so a plain local list would
+    # reset to [] every time and re-print every message as "new". Keep the
+    # seen-set in session_state so it survives reruns (no duplicates).
+    if "displayed" not in st.session_state:
+        st.session_state.displayed = []
+
+    messages = fetch_messages()
+    new_messages = [m for m in messages if m not in st.session_state.displayed]
+    if new_messages:
+        display_messages(new_messages)
+        st.session_state.displayed.extend(new_messages)
+
+    time.sleep(1)   # poll once a second instead of busy-looping the server
+    st.rerun()
 
 if __name__ == "__main__":
     main()

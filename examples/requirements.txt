@@ -1,0 +1,11 @@
+# Python deps for the starter examples in this folder.
+# Install:  pip install -r examples/requirements.txt
+# (ollama_stream.py also needs a running `ollama serve`; mqtt_example.py
+#  needs a Mosquitto broker — `sudo apt install mosquitto` / `brew install mosquitto`.)
+
+psutil            # system_stats.py — process RSS + RAM + (nvidia-smi for VRAM)
+requests          # ollama_stream.py, requests_stream_demo.py
+flask             # memory_hog_server.py, flask_app.py (the UI demo)
+paho-mqtt         # mqtt_example.py (B5 extra credit)
+sentence-transformers  # rag_minimal.py — all-MiniLM-L6-v2 embeddings (CPU)
+numpy             # rag_minimal.py — cosine similarity store

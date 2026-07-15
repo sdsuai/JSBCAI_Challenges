@@ -50,7 +50,9 @@ def gpu_stats():
         return []
     gpus = []
     for line in out.strip().splitlines():
-        name, used, total = [field.strip() for field in line.split(",")]
+        # rsplit from the right so a GPU name containing a comma still works
+        # (the two numeric fields are always last). maxsplit=2 keeps them.
+        name, used, total = [field.strip() for field in line.rsplit(",", 2)]
         gpus.append({"name": name,
                      "vram_used_mb": int(used),
                      "vram_total_mb": int(total)})

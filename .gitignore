@@ -1,2 +1,13 @@
 __pycache__/
 *.pyc
+
+# Generated / reproducible runtime artifacts — don't commit these.
+# (Their CODE is the deliverable; show them live in your video instead.)
+# B6.3 throws a 50 MB file at /chat on purpose:
+big.json
+# your persistence layer + alt logging:
+*.sqlite
+logs.jsonl
+# vector store (FAISS or a whole index dir):
+*.index
+index/
