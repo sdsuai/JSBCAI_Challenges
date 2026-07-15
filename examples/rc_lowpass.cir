@@ -1,0 +1,31 @@
+* RC low-pass filter starter (Task 1 mechanics)
+* Run headless:    ngspice -b rc_lowpass.cir
+* Interactive:     ngspice rc_lowpass.cir   then e.g.:  plot v(in) v(out)
+*
+* Starter values give fc ~ 3.4 kHz. The assignment asks for a DIFFERENT
+* cutoff -- pick your own R and C and show the math. LTspice/KiCad users:
+* rebuild this schematic (3 parts) and use their AC/transient dialogs.
+
+* Signal source: 0.5 V amplitude at 100 Hz. "AC 1" makes it the reference
+* for the frequency sweep.
+Vsig sig 0 SIN(0 0.5 100) AC 1
+
+* "Noise" source stacked in series on top of the signal: 0.1 V at 50 kHz.
+* (Two sources in series is the standard SPICE way to sum waveforms.)
+Vnoise in sig SIN(0 0.1 50k)
+
+R1 in  out 4.7k
+C1 out 0   10n
+
+.control
+* ---- frequency response ----
+ac dec 100 10 10meg
+meas ac fc     WHEN vdb(out)=-3
+meas ac att50k FIND vdb(out) AT=50k
+
+* ---- time domain: watch the noise get filtered ----
+tran 2u 20m
+wrdata rc_tran.txt v(in) v(out)
+echo "rc_tran.txt written (columns: time v(in) time v(out)) - plot it with any tool"
+.endc
+.end
