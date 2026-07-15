@@ -18,7 +18,7 @@
 The platform I advise to run LLMs from is [ollama](https://ollama.com/) as it's the easierst to set up, here is their [repo](https://github.com/ollama/ollama). The ollama repo also provides some example scripts that might provide some inspiration on how to go about solving some parts of the problem. There are other API platforms like vllm and llama.cpp you could try too. You could use the transformers library and fastAPI or flask and set up your own API service that way too.
 For those with not so good PCs, again the "bare-minimum" can be done with just CPU, you can pull a small LLM like `gemma:2b` or `tinyllama` (these are around 2GB in size) locally on your ollama and just use those. For the webUI you may use streamlit and Flask as a server to retreive user queries and LLM responses from. I have provided two scripts which use streamlit and Flask to show a simple example of to get user input to show up on the streamlit webUI. Again, this is just advice, any other way you can get this done, you can just do that. You don't have to use ollama , or streamlit or Flask.
 
-For **Part B (Networking & Data Transfer)** I have provided starter examples in the `examples/` folder: a TCP command server/client pair, a UDP telemetry sender/receiver pair, an MQTT pub/sub example, a curl cheatsheet, and (for the B6 extra credit) a memory-pressure demo server plus a memory-watcher script. These are deliberately minimal — they show you the mechanics (socket setup, message framing, sequence numbers), but you must adapt them into your own system. Copy-pasting them unmodified will not satisfy the requirements.
+For **Part B (Networking & Data Transfer)** and the resource-monitoring requirement I have provided starter examples in the `examples/` folder: a TCP command server/client pair, a UDP telemetry sender/receiver pair, an MQTT pub/sub example, a curl cheatsheet, a CPU-RAM/GPU-VRAM stats helper (`system_stats.py`), and (for the B6 extra credit) a memory-pressure demo server plus a memory-watcher script. These are deliberately minimal — they show you the mechanics (socket setup, message framing, sequence numbers), but you must adapt them into your own system. Copy-pasting them unmodified will not satisfy the requirements.
 
 # 🧠 LLM + RAG WebUI Coding Challenge
 
@@ -86,6 +86,7 @@ You will build a **WebUI + backend service** that supports:
    * Show RAG mode
    * Show retrieval sources displayed under answers
    * Show session persistence
+   * Show the **RAM/VRAM panel during the first request of a fresh session** — watch the model get loaded, and say out loud what jumped and why
    * **Part B:** run `curl_tests.sh` live; demonstrate the TCP kill/reconnect scenario; show live UDP telemetry and the `--drop 0.2` loss counter
    * If you implemented extra credit, demonstrate it
 
@@ -112,6 +113,7 @@ Your system must include:
   * `/chat`
   * `/rag`
   * `/stream` (stream responses)
+  * `/stats` (CPU RAM + GPU VRAM — see *Resource monitoring*)
   * `/eval` (optional)
   * `/tool` (optional)
 
@@ -145,6 +147,7 @@ Your system must include:
 * Ability to **switch modes without losing conversation history**
 * Ability to **filter conversation history by mode**
 * Show **session ID** somewhere
+* Show **live RAM / VRAM usage** (see *Resource monitoring* under Required Technical Features)
 
 ## 3. Session Memory + Persistence
 
@@ -155,6 +158,7 @@ Always store:
 * Input prompt
 * LLM response
 * RAG retrieved chunks
+* Resource snapshot at response time (RAM, and VRAM if present)
 * (Optional) tool outputs
 * Session ID
 
@@ -256,6 +260,34 @@ UI must indicate:
 * When server is loading
 * When LLM server is unreachable
 * When LLM returns invalid JSON for tool mode
+
+## ✔ Resource monitoring (CPU RAM + GPU VRAM)
+
+We want to see how much memory your system **actually** uses. Works with or without a GPU — on CPU-only machines the RAM numbers alone satisfy this.
+
+* Your backend must expose a **`GET /stats`** endpoint returning at least:
+
+```json
+{
+  "process_rss_mb": 412,
+  "ram_used_mb": 9830,
+  "ram_total_mb": 16384,
+  "gpus": [{"name": "RTX 3060", "vram_used_mb": 5210, "vram_total_mb": 12288}]
+}
+```
+
+  (`"gpus": []` is a perfectly valid answer on a machine with no NVIDIA GPU.)
+
+* Your **UI must display these numbers live** — always visible (sidebar or status bar), refreshed at least every few seconds.
+* Your **persistence layer must store a stats snapshot with every chat/RAG interaction**, so the memory history of a session can be replayed.
+* **Scope matters — explain it in your README.** There are three different scopes above: your backend process (RSS), the whole machine (RAM), and the whole GPU (VRAM). If you use ollama, the model lives inside `ollama serve`'s process — **not** your backend. Which of your numbers can actually see the model, and why?
+* **Observe and explain at least two memory events**, for example:
+  * RAM/VRAM jumping on the **first** request of a session (the model being loaded — and why that request is also the slowest)
+  * ollama **unloading** the model after idle (default `keep_alive` ≈ 5 min) and the memory dropping back
+  * the **embedding model** loading when you build your RAG index
+  * the difference between two model sizes (e.g. `tinyllama` vs `gemma:2b`)
+
+Starter helper: `examples/system_stats.py` — one function returning exactly this JSON, GPU part degrades gracefully when `nvidia-smi` doesn't exist.
 
 ---
 
@@ -542,6 +574,7 @@ If on GPU:
 | WebUI quality                | 20     | clarity, styling, colors, streaming, switching modes |
 | RAG correctness              | 25     | indexing, retrieval, sources, citations              |
 | Session memory + persistence | 10     | logs, reload, multi-session                          |
+| Resource monitoring          | 10     | `/stats`, live UI numbers, logged snapshots, memory events explained |
 | Config & reproducibility     | 10     | `.env`, config.yaml, run.sh                          |
 | Video walkthrough            | 15     | clarity, explanation, demonstration                  |
 | **Extra Credit Tier 1**      | +10    | tool mode, eval mode, profiling                      |
@@ -558,7 +591,7 @@ If on GPU:
 | **B5 Extra Credit: MQTT**       | +10    | QoS, retained + Last Will, fan-out demo                          |
 | **B6 Extra Credit: memory pressure** | +10 | buffered-vs-streamed RSS table, backpressure, 413, `stream=True` |
 
-**Maximum: 100 (Part A) + 45 (Part B) + 40 extra credit = 185 points**
+**Maximum: 110 (Part A) + 45 (Part B) + 40 extra credit = 195 points**
 
 ---
 
@@ -610,6 +643,8 @@ Before submitting, ensure you have:
 ### ✔ Streaming UI
 
 ### ✔ Mode switching fully working
+
+### ✔ `/stats` endpoint + live RAM/VRAM in the UI + logged snapshots
 
 ### ✔ `curl_tests.sh` (or `curl_tests.ps1`) with all 5 required calls
 
