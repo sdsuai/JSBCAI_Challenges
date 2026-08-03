@@ -17,7 +17,26 @@ unless there is a reason not to.
 * **Hardware** — assume the candidate owns nothing beyond a personal laptop.
   No GPU, no dev boards, no panels, no paid accounts. Anything requiring
   hardware is extra credit only.
-* **Difficulty** — completable by a sophomore in a focused week.
+* **Platforms** — must run on macOS, Linux, and Windows (incl. WSL). Prefer
+  standard-library-only starters so there is no dependency story; where a
+  platform needs a one-line fix (`python3-tk`, `windows-curses`,
+  `libncurses-dev`), state it in a support table rather than leaving the
+  candidate to discover it. Ship a `--demo probe` style capability check so
+  they can confirm their terminal in ten seconds.
+* **Difficulty** — completable by a sophomore.
+* **Time box — 5 to 7 days of active work**, stated prominently near the top
+  with the rationale, not buried. The rationale is deliberate and should be
+  carried over verbatim in spirit: volunteering here means taking real time out
+  of weeknights and weekends, consistently, and an applicant who can carve out
+  that time for the challenge can carve it out for lab work. The window exists
+  to filter out people who would engage once every fortnight — stated as a
+  matter of *fit*, not of worth, since being over-committed elsewhere is
+  legitimate but incompatible with the lab's pace. Applicants who cannot make
+  the window must email `philipamadasun1@gmail.com` **before** it expires with
+  an explanation; extensions are granted at his discretion, and asking is
+  explicitly never held against them. Pair this with advice to cut scope and
+  document what was cut, so the time box tests scoping judgment rather than
+  just speed.
 * **Structure** — tiered parts, each required part stating its requirements as
   a numbered list, plus Tier 1 (laptop-friendly) and Tier 2 (harder) extra
   credit with explicit point values.
