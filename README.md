@@ -1,6 +1,10 @@
-# 🖧 Lab Ops — Systems, Storage & Security Challenge
+# 🖧 Lab Ops — Systems, Storage & Security Challenge · Grade 1
 
-**JSBCAI / Robotics Lab — Sysadmin Assistant Task**
+**JSBCAI / Robotics Lab — Sysadmin Assistant Task · Grade 1**
+
+> This is the **Grade 1** variant. Grade 2 is the same challenge with a
+> heavier Tier 2 extra-credit list. If you were sent here directly, this is
+> the one to do — do not go looking for the other branch.
 
 We already have a lab sysadmin. What we need is students who can take focused
 work off their plate — the tickets that eat an afternoon and do not need the
@@ -487,7 +491,7 @@ obvious when the write-up is not in the same voice as the video.
 | --- | --- | --- |
 | **Disaster recovery drill** | +15 | Destroy `lab-server` entirely. Rebuild it from your backups and committed config. **Time it**, and report what you discovered was missing — there is always something. The single most valuable item on this list. |
 | **LDAP over TLS** | +12 | Your own CA, certificate on the server, `ldaps://` enforced, anonymous bind restricted. Show the traffic encrypted before and after. |
-| **SSH certificate auth** | +10 | A small CA issuing short-lived user certificates instead of `authorized_keys`. Explain what this fixes about key management at lab scale. |
+| **Automated offboarding with an audit trail** | +10 | Turn Ticket A4 into one reviewable command: disable the directory account, inventory everything that user owns across the share, and write an audit record of who ran it, when, and what changed. **Deletion must require a separate explicit flag**, and everything before that point must be reversible. Show it run against a test account, show the audit record, and show it refusing to delete without the flag. |
 | **Centralized logging** | +10 | Ship both VMs' logs to one place, so an attacker clearing local logs does not erase the evidence. Relate it to D3. |
 
 ---
