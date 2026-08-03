@@ -29,20 +29,27 @@ build* when nobody specifies the layout — because that is the job.
 * **You do not need an LED matrix.** You are not assumed to own any hardware at
   all. The matrix is simulated in your terminal with zero dependencies (see
   Part C). If you *do* own a panel, that is extra credit — never a requirement.
-* **This runs on any laptop.** macOS, Linux, Windows, WSL. No GPU, no network,
-  no accounts, nothing to buy. If your machine can run a terminal and a compiler
-  or Python, you can do all of this.
-* **Everything runs from your OS terminal.** Windows: PowerShell or Windows
-  Terminal (or WSL). macOS/Linux: bash/zsh. In your screen recording you MUST
-  launch your programs from a terminal.
-* **You may freely use any tool available to you** — the internet, ChatGPT,
-  Claude, Copilot, anything. What we assess is your *design judgment*, your
-  *implementation*, and your *video explanation*. Be aware that AI tools are
-  quite bad at the specific thing we are testing here: they will happily give
-  you a layout that shows everything at once, which is exactly the failure mode
-  this challenge is built to detect.
-* **Time expectation:** a focused week. If you are past two weeks, you have
-  over-built — cut scope, finish, and say what you cut in your write-up.
+* **This runs on any laptop — macOS, Linux, or Windows.** No GPU, no network, no
+  accounts, nothing to buy, no dev boards. Everything is local. If your machine
+  can run a terminal and either Python or a C++ compiler, you can do all of
+  this. See [Platform support](#-platform-support) below for the details.
+* **This task requires you to run your code from your machine's OS terminal.**
+  On Windows that is PowerShell (there's another shell too, I think); on macOS
+  and Linux a common one is bash. Your OS might use a different terminal from
+  what I mentioned, or might have several — doesn't matter, just use one.
+* **After completing this task you will need to screen record a video** showing
+  that your code works and you explaining how it works. Obviously, in the screen
+  recording you MUST run your programs from the terminal.
+* **Create a GitHub repo containing your code and the video.** Name it something
+  like `JSB_ux_design_challenge` so it's identifiable.
+* **You may freely use any tool available to you** to accomplish this task. The
+  internet, ChatGPT, Claude, Copilot, anything. What we assess is your *design
+  judgment*, your *implementation*, and your *video explanation*. Be aware that
+  AI tools are quite bad at the specific thing we are testing here: they will
+  happily hand you a layout that shows everything at once, which is exactly the
+  failure mode this challenge is built to detect.
+* **You may use the starter code in `examples/` to get going** if you choose. It
+  shows the mechanics; the requirements are always bigger than the examples.
 
 ### 📮 Submission — READ THE ENTIRE BULLET
 
@@ -55,6 +62,75 @@ build* when nobody specifies the layout — because that is the job.
   get access.
 * **Put your email address in your README.** Please don't make us go looking.
 * Name the repo something identifiable, e.g. `JSB_ux_design_challenge`.
+
+---
+
+## ⏱ Time commitment — 5 to 7 days
+
+**This problem set is scoped to 5–7 days of real, active work.** Not five to
+seven calendar days with the tab open — five to seven days of actually sitting
+down and grinding on it.
+
+That window is deliberate, and meeting it is part of what we are measuring.
+
+Volunteering in this lab means taking real time out of your weeknights and your
+weekends, consistently, for work you have been assigned. That *is* the role. If
+you can carve out that time for this challenge, you can carve it out for the
+tasks we hand you once you are here. If you cannot, the fit is wrong — and it is
+far better for both of us to learn that now than three weeks into a project that
+is sitting blocked on you.
+
+To be direct, because you deserve to know what you are signing up for: this is
+not a role that works for someone who can look at their assignment once every
+two weeks. That is not a judgment about you or your priorities. Plenty of
+capable people are genuinely committed elsewhere — coursework, a job, family —
+and that is completely legitimate. It is simply not compatible with the pace
+this lab runs at, and pretending otherwise wastes your semester as well as ours.
+
+**If you cannot make the window, email `philipamadasun1@gmail.com` *before* it
+runs out**, explain why, and ask for more time. Real reasons exist — exam weeks,
+illness, work shifts, a laptop that died. Ask and explain, and I will decide
+whether the explanation warrants an extension. **Asking is never held against
+you.** Going quiet and surfacing late with no word is a different thing
+entirely, and it tells us what working with you would be like.
+
+If you are running out of time, **ship three finished surfaces that each do one
+thing well** rather than three half-built ones attempting everything. Say what
+you cut and why in your write-up. Scoping under pressure is a design skill and
+we grade it as one.
+
+---
+
+## 💻 Platform support
+
+Everything in this challenge runs on **macOS, Linux, and Windows** (including
+WSL). There are no third-party dependencies in any starter — the Python files
+import only the standard library, and the C++ headers need only a C++17
+compiler. The LED matrix simulator includes the Windows console setup
+(virtual-terminal mode and UTF-8) needed for it to render correctly there.
+
+| | macOS | Linux / WSL | Windows |
+| --- | --- | --- | --- |
+| Matrix simulator, gamma, easing, scenario player (both languages) | ✅ | ✅ | ✅ |
+| `contrast.py`, `flash_audit.py`, `make_scenario.py` | ✅ | ✅ | ✅ |
+| `gui_minimal.py` (tkinter) | ✅ | ⚠️ `sudo apt install python3-tk` | ✅ |
+| `tui_minimal.py` (curses) | ✅ | ✅ | ⚠️ `pip install windows-curses`, or use WSL |
+| `tui_minimal.cpp` (ncurses) | ✅ | ⚠️ `sudo apt install libncurses-dev` | ⚠️ build under WSL, or use [FTXUI](https://github.com/ArthurSonzogni/FTXUI) |
+
+The two ⚠️ TUI rows are the only real friction, they affect the *starter* rather
+than the assignment, and each has a one-line fix. Your own TUI may use any
+library you like — `rich`/`textual` (Python) and FTXUI (C++) are fully
+cross-platform with no system packages at all.
+
+**Terminal requirement:** you need 24-bit ("truecolor") support, which every
+current terminal has — Windows Terminal, iTerm2, macOS Terminal, GNOME Terminal,
+Konsole, Alacritty, kitty. Confirm yours in ten seconds with
+`python3 matrix_sim.py --demo probe` (or `./demo probe`). The one thing to avoid
+is the legacy Windows `conhost` console; use Windows Terminal instead.
+
+**Pick whichever platform you already have.** No part of this challenge is
+easier or harder to score well on depending on your OS, and we do not care which
+one you use.
 
 ---
 
@@ -473,6 +549,12 @@ examples/
 
 ## ✅ Final submission checklist
 
+**Before anything else**
+
+- [ ] Started within a window you can finish in — **5–7 days of active work**
+- [ ] If that window will not work, emailed `philipamadasun1@gmail.com` with the
+      reason **before** it ran out
+
 **Required**
 
 - [ ] `DESIGN.md`, written before you built, with the "what changed" section added after
@@ -504,7 +586,7 @@ are in exactly the right place — that is the actual problem, and it is why thi
 challenge exists. Go back to Part 0, pick your one 300-millisecond thing, and
 let everything else be secondary to it.
 
-And if you run out of time: **ship three finished surfaces that each do one
-thing well** rather than three half-built ones that try to do everything. Say
-what you cut and why in your write-up. That is a design decision too, and we
-will read it as one.
+Watch the clock against [the 5–7 day window](#-time-commitment--5-to-7-days).
+Finished and scoped beats ambitious and unfinished, every time — and if the
+window genuinely does not work for you, email before it closes rather than
+after.
