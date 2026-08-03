@@ -1,0 +1,74 @@
+# users.ldif — four accounts that already exist when you arrive.
+#
+# Each is a posixAccount, the objectClass that gives an entry the fields the
+# operating system needs: uidNumber, gidNumber, homeDirectory, loginShell.
+# inetOrgPerson supplies the human fields (cn, sn, mail).
+#
+# The password hashes below are SSHA of the string "labpass" for every account.
+# Obviously terrible. It is a disposable lab reachable only from your own
+# machine — but "everyone has the same password and it is in git" is exactly
+# the kind of thing Part D expects you to notice and have an opinion about.
+#
+#   alice   10001   staff, robotics   — the lab manager
+#   bob     10002   students, robotics
+#   carol   10003   students
+#   dave    10004   students          — graduated last month. See Ticket A4.
+#
+# uidNumber is the number that matters. Names are for humans; the kernel and
+# NFS only ever compare numbers.
+
+dn: uid=alice,ou=people,dc=jsbcai,dc=lab
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: alice
+cn: Alice Nkemdirim
+sn: Nkemdirim
+mail: alice@jsbcai.lab
+uidNumber: 10001
+gidNumber: 20001
+homeDirectory: /srv/lab/home/alice
+loginShell: /bin/bash
+userPassword: {SSHA}W4lEdxCJoy9O58XAZuSZK/pj2g9qc2JjYWkwMQ==
+
+dn: uid=bob,ou=people,dc=jsbcai,dc=lab
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: bob
+cn: Bob Iwuchukwu
+sn: Iwuchukwu
+mail: bob@jsbcai.lab
+uidNumber: 10002
+gidNumber: 20002
+homeDirectory: /srv/lab/home/bob
+loginShell: /bin/bash
+userPassword: {SSHA}W4lEdxCJoy9O58XAZuSZK/pj2g9qc2JjYWkwMQ==
+
+dn: uid=carol,ou=people,dc=jsbcai,dc=lab
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: carol
+cn: Carol Adeyemi
+sn: Adeyemi
+mail: carol@jsbcai.lab
+uidNumber: 10003
+gidNumber: 20002
+homeDirectory: /srv/lab/home/carol
+loginShell: /bin/bash
+userPassword: {SSHA}W4lEdxCJoy9O58XAZuSZK/pj2g9qc2JjYWkwMQ==
+
+dn: uid=dave,ou=people,dc=jsbcai,dc=lab
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: dave
+cn: Dave Okonkwo
+sn: Okonkwo
+mail: dave@jsbcai.lab
+uidNumber: 10004
+gidNumber: 20002
+homeDirectory: /srv/lab/home/dave
+loginShell: /bin/bash
+userPassword: {SSHA}W4lEdxCJoy9O58XAZuSZK/pj2g9qc2JjYWkwMQ==

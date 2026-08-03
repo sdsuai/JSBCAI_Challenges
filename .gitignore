@@ -1,0 +1,12 @@
+# Candidate work that should not be committed
+*.retry
+.vagrant/
+*.log.gz
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp

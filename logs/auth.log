@@ -1,0 +1,90 @@
+Mar 9 07:12:04 lab-server sshd[1282]: Accepted publickey for alice from 10.44.2.15 port 44943 ssh2: RSA SHA256:t7Qb3v0Jm9xK2pLc8sYwR4hN1dFgZaEuXvB6oMnQiTk
+Mar 9 07:12:05 lab-server sshd[1301]: pam_unix(sshd:session): session opened for user alice(uid=10001) by (uid=0)
+Mar 9 08:03:04 lab-server sshd[1366]: Accepted publickey for bob from 10.44.2.31 port 41582 ssh2: RSA SHA256:t7Qb3v0Jm9xK2pLc8sYwR4hN1dFgZaEuXvB6oMnQiTk
+Mar 9 08:03:05 lab-server sshd[1218]: pam_unix(sshd:session): session opened for user bob(uid=10002) by (uid=0)
+Mar 9 08:41:04 lab-server sshd[1337]: Accepted publickey for carol from 10.44.2.44 port 43084 ssh2: RSA SHA256:t7Qb3v0Jm9xK2pLc8sYwR4hN1dFgZaEuXvB6oMnQiTk
+Mar 9 08:41:05 lab-server sshd[1293]: pam_unix(sshd:session): session opened for user carol(uid=10003) by (uid=0)
+Mar 9 09:02:11 lab-server sudo[1502]:   alice : TTY=pts/0 ; PWD=/srv/lab ; USER=root ; COMMAND=/usr/bin/systemctl status nfs-kernel-server
+Mar 10 02:14:09 lab-server sshd[3100]: Failed password for root from 203.0.113.47 port 33801 ssh2
+Mar 10 02:14:14 lab-server sshd[3101]: Failed password for invalid user admin from 203.0.113.47 port 32457 ssh2
+Mar 10 02:14:17 lab-server sshd[3102]: Failed password for ubuntu from 203.0.113.47 port 58419 ssh2
+Mar 10 02:14:25 lab-server sshd[3103]: Failed password for invalid user test from 203.0.113.47 port 34578 ssh2
+Mar 10 02:14:30 lab-server sshd[3104]: Failed password for invalid user oracle from 203.0.113.47 port 35944 ssh2
+Mar 10 02:14:38 lab-server sshd[3105]: Failed password for invalid user postgres from 203.0.113.47 port 33873 ssh2
+Mar 10 02:14:41 lab-server sshd[3106]: Failed password for invalid user git from 203.0.113.47 port 44630 ssh2
+Mar 10 02:14:41 lab-server sshd[3106]: error: maximum authentication attempts exceeded for git from 203.0.113.47 port 34054 ssh2 [preauth]
+Mar 10 02:14:41 lab-server sshd[3106]: Disconnecting authenticating user: Too many authentication failures [preauth]
+Mar 10 02:14:49 lab-server sshd[3107]: Failed password for invalid user jenkins from 203.0.113.47 port 33249 ssh2
+Mar 10 02:14:54 lab-server sshd[3108]: Failed password for invalid user user from 203.0.113.47 port 33052 ssh2
+Mar 10 02:14:58 lab-server sshd[3109]: Failed password for invalid user deploy from 203.0.113.47 port 48979 ssh2
+Mar 10 02:15:06 lab-server sshd[3110]: Failed password for root from 203.0.113.47 port 39453 ssh2
+Mar 10 02:15:09 lab-server sshd[3111]: Failed password for invalid user admin from 203.0.113.47 port 50216 ssh2
+Mar 10 02:15:13 lab-server sshd[3112]: Failed password for ubuntu from 203.0.113.47 port 36753 ssh2
+Mar 10 02:15:18 lab-server sshd[3113]: Failed password for invalid user test from 203.0.113.47 port 54405 ssh2
+Mar 10 02:15:18 lab-server sshd[3113]: error: maximum authentication attempts exceeded for test from 203.0.113.47 port 36385 ssh2 [preauth]
+Mar 10 02:15:18 lab-server sshd[3113]: Disconnecting authenticating user: Too many authentication failures [preauth]
+Mar 10 02:15:21 lab-server sshd[3114]: Failed password for invalid user oracle from 203.0.113.47 port 33906 ssh2
+Mar 10 02:15:26 lab-server sshd[3115]: Failed password for invalid user postgres from 203.0.113.47 port 62533 ssh2
+Mar 10 02:15:34 lab-server sshd[3116]: Failed password for invalid user git from 203.0.113.47 port 50587 ssh2
+Mar 10 02:15:43 lab-server sshd[3117]: Failed password for invalid user jenkins from 203.0.113.47 port 59699 ssh2
+Mar 10 02:15:50 lab-server sshd[3118]: Failed password for invalid user user from 203.0.113.47 port 49645 ssh2
+Mar 10 02:15:55 lab-server sshd[3119]: Failed password for invalid user deploy from 203.0.113.47 port 41781 ssh2
+Mar 10 02:16:00 lab-server sshd[3120]: Failed password for root from 203.0.113.47 port 35364 ssh2
+Mar 10 02:16:00 lab-server sshd[3120]: error: maximum authentication attempts exceeded for root from 203.0.113.47 port 49677 ssh2 [preauth]
+Mar 10 02:16:00 lab-server sshd[3120]: Disconnecting authenticating user: Too many authentication failures [preauth]
+Mar 10 02:16:09 lab-server sshd[3121]: Failed password for invalid user admin from 203.0.113.47 port 52510 ssh2
+Mar 10 02:16:18 lab-server sshd[3122]: Failed password for ubuntu from 203.0.113.47 port 48870 ssh2
+Mar 10 02:16:21 lab-server sshd[3123]: Failed password for invalid user test from 203.0.113.47 port 37737 ssh2
+Mar 10 02:16:29 lab-server sshd[3124]: Failed password for invalid user oracle from 203.0.113.47 port 40810 ssh2
+Mar 10 02:16:36 lab-server sshd[3125]: Failed password for invalid user postgres from 203.0.113.47 port 39960 ssh2
+Mar 10 02:16:45 lab-server sshd[3126]: Failed password for invalid user git from 203.0.113.47 port 57636 ssh2
+Mar 10 02:16:47 lab-server sshd[3127]: Failed password for invalid user jenkins from 203.0.113.47 port 35086 ssh2
+Mar 10 02:16:47 lab-server sshd[3127]: error: maximum authentication attempts exceeded for jenkins from 203.0.113.47 port 50561 ssh2 [preauth]
+Mar 10 02:16:47 lab-server sshd[3127]: Disconnecting authenticating user: Too many authentication failures [preauth]
+Mar 10 02:16:54 lab-server sshd[3128]: Failed password for invalid user user from 203.0.113.47 port 52949 ssh2
+Mar 10 02:17:03 lab-server sshd[3129]: Failed password for invalid user deploy from 203.0.113.47 port 59897 ssh2
+Mar 10 02:17:06 lab-server sshd[3130]: Failed password for root from 203.0.113.47 port 36133 ssh2
+Mar 10 02:17:12 lab-server sshd[3131]: Failed password for invalid user admin from 203.0.113.47 port 61070 ssh2
+Mar 10 02:17:15 lab-server sshd[3132]: Failed password for ubuntu from 203.0.113.47 port 33976 ssh2
+Mar 10 02:17:21 lab-server sshd[3133]: Failed password for invalid user test from 203.0.113.47 port 59205 ssh2
+Mar 10 02:17:27 lab-server sshd[3134]: Failed password for invalid user oracle from 203.0.113.47 port 55283 ssh2
+Mar 10 02:17:27 lab-server sshd[3134]: error: maximum authentication attempts exceeded for oracle from 203.0.113.47 port 52741 ssh2 [preauth]
+Mar 10 02:17:27 lab-server sshd[3134]: Disconnecting authenticating user: Too many authentication failures [preauth]
+Mar 10 02:17:29 lab-server sshd[3135]: Failed password for invalid user postgres from 203.0.113.47 port 60257 ssh2
+Mar 10 02:17:36 lab-server sshd[3136]: Failed password for invalid user git from 203.0.113.47 port 41013 ssh2
+Mar 10 02:17:39 lab-server sshd[3137]: Failed password for invalid user jenkins from 203.0.113.47 port 62354 ssh2
+Mar 10 02:17:41 lab-server sshd[3138]: Failed password for invalid user user from 203.0.113.47 port 44300 ssh2
+Mar 10 02:17:47 lab-server sshd[3139]: Failed password for invalid user deploy from 203.0.113.47 port 38476 ssh2
+Mar 10 02:17:52 lab-server sshd[3140]: Failed password for root from 203.0.113.47 port 56076 ssh2
+Mar 10 02:18:00 lab-server sshd[3141]: Failed password for invalid user admin from 203.0.113.47 port 62539 ssh2
+Mar 10 02:18:00 lab-server sshd[3141]: error: maximum authentication attempts exceeded for admin from 203.0.113.47 port 35280 ssh2 [preauth]
+Mar 10 02:18:00 lab-server sshd[3141]: Disconnecting authenticating user: Too many authentication failures [preauth]
+Mar 10 02:18:04 lab-server sshd[3142]: Failed password for ubuntu from 203.0.113.47 port 59437 ssh2
+Mar 10 02:18:12 lab-server sshd[3143]: Failed password for invalid user test from 203.0.113.47 port 48208 ssh2
+Mar 10 02:18:16 lab-server sshd[3144]: Failed password for invalid user oracle from 203.0.113.47 port 58214 ssh2
+Mar 10 02:18:22 lab-server sshd[3145]: Failed password for invalid user postgres from 203.0.113.47 port 57216 ssh2
+Mar 10 02:18:29 lab-server sshd[3146]: Failed password for invalid user git from 203.0.113.47 port 54932 ssh2
+Mar 10 02:18:34 lab-server sshd[3147]: Failed password for invalid user jenkins from 203.0.113.47 port 39890 ssh2
+Mar 10 02:18:37 lab-server sshd[3148]: Failed password for invalid user user from 203.0.113.47 port 41548 ssh2
+Mar 10 02:18:37 lab-server sshd[3148]: error: maximum authentication attempts exceeded for user from 203.0.113.47 port 39915 ssh2 [preauth]
+Mar 10 02:18:37 lab-server sshd[3148]: Disconnecting authenticating user: Too many authentication failures [preauth]
+Mar 10 02:18:42 lab-server sshd[3149]: Failed password for invalid user deploy from 203.0.113.47 port 45291 ssh2
+Mar 10 02:18:44 lab-server sshd[3150]: Failed password for root from 203.0.113.47 port 61782 ssh2
+Mar 10 02:18:48 lab-server sshd[3151]: Failed password for invalid user admin from 203.0.113.47 port 47219 ssh2
+Mar 10 02:18:54 lab-server sshd[3152]: Failed password for ubuntu from 203.0.113.47 port 30268 ssh2
+Mar 10 02:18:58 lab-server sshd[3153]: Failed password for invalid user test from 203.0.113.47 port 57456 ssh2
+Mar 10 02:19:05 lab-server sshd[3154]: Failed password for invalid user oracle from 203.0.113.47 port 50880 ssh2
+Mar 10 02:19:09 lab-server sshd[3155]: Failed password for invalid user postgres from 203.0.113.47 port 63783 ssh2
+Mar 10 02:19:09 lab-server sshd[3155]: error: maximum authentication attempts exceeded for postgres from 203.0.113.47 port 33538 ssh2 [preauth]
+Mar 10 02:19:09 lab-server sshd[3155]: Disconnecting authenticating user: Too many authentication failures [preauth]
+Mar 10 02:19:18 lab-server sshd[3156]: Failed password for invalid user git from 203.0.113.47 port 55714 ssh2
+Mar 10 02:19:26 lab-server sshd[3157]: Failed password for invalid user jenkins from 203.0.113.47 port 56147 ssh2
+Mar 10 02:22:34 lab-server sshd[3502]: Accepted password for dave from 203.0.113.47 port 51221 ssh2
+Mar 10 02:22:35 lab-server sshd[3502]: pam_unix(sshd:session): session opened for user dave(uid=10004) by (uid=0)
+Mar 10 02:22:48 lab-server sudo[3540]:     dave : TTY=pts/1 ; PWD=/home/dave ; USER=root ; COMMAND=/usr/bin/apt-get install -y netcat-openbsd
+Mar 10 02:22:50 lab-server sudo[3540]: pam_unix(sudo:session): session opened for user root(uid=0) by dave(uid=10004)
+Mar 10 02:24:48 lab-server sudo[3611]:     dave : TTY=pts/1 ; PWD=/srv/lab ; USER=root ; COMMAND=/usr/bin/tar -czf /tmp/.cache.tgz /srv/lab/datasets
+Mar 10 02:30:48 lab-server sshd[3502]: pam_unix(sshd:session): session closed for user dave
+Mar 10 08:17:52 lab-server sshd[4102]: Accepted publickey for alice from 10.44.2.15 port 44120 ssh2: RSA SHA256:t7Qb3v0Jm9xK2pLc8sYwR4hN1dFgZaEuXvB6oMnQiTk
+Mar 10 08:17:53 lab-server sshd[4102]: pam_unix(sshd:session): session opened for user alice(uid=10001) by (uid=0)
+Mar 10 08:21:52 lab-server sudo[4180]:   alice : TTY=pts/0 ; PWD=/srv/lab ; USER=root ; COMMAND=/usr/bin/tail -n 200 /var/log/lab-backup.log

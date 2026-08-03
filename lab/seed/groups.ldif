@@ -1,0 +1,35 @@
+# groups.ldif — the lab's three groups.
+#
+# posixGroup is what makes a group visible to the operating system: it has a
+# gidNumber, which is the number the kernel actually checks when deciding
+# whether you may write to a file. The NAME is a convenience for humans.
+#
+# THESE gidNumbers MUST MATCH the groups created on lab-server in
+# provision/server.sh. When a group is 20002 on one machine and 20002 means
+# something else on another, NFS hands you files owned by a stranger. Keeping
+# these numbers identical everywhere is the whole job of a directory service.
+#
+#   staff     20001   can write to /srv/lab/shared
+#   students  20002   the group most volunteers land in
+#   robotics  20003   read access to /srv/lab/datasets
+
+dn: cn=staff,ou=groups,dc=jsbcai,dc=lab
+objectClass: posixGroup
+cn: staff
+gidNumber: 20001
+memberUid: alice
+
+dn: cn=students,ou=groups,dc=jsbcai,dc=lab
+objectClass: posixGroup
+cn: students
+gidNumber: 20002
+memberUid: bob
+memberUid: carol
+memberUid: dave
+
+dn: cn=robotics,ou=groups,dc=jsbcai,dc=lab
+objectClass: posixGroup
+cn: robotics
+gidNumber: 20003
+memberUid: alice
+memberUid: bob

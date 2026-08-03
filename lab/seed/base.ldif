@@ -1,0 +1,24 @@
+# base.ldif — the two organizational units everything else hangs off.
+#
+# An LDAP directory is a tree. Every entry has a DN (distinguished name) that
+# is its full path from the root, read right to left:
+#
+#     uid=alice,ou=people,dc=jsbcai,dc=lab
+#     └─ entry  └─ branch  └────── root (the "base DN")
+#
+# `dc` is a domain component, so dc=jsbcai,dc=lab mirrors the DNS name
+# jsbcai.lab. `ou` is an organizational unit — just a folder, by convention.
+#
+# The `objectClass` values decide which attributes an entry is ALLOWED to have.
+# Get them wrong and the server rejects the entry with "object class violation",
+# which is the single most common error you will hit when adding users.
+
+dn: ou=people,dc=jsbcai,dc=lab
+objectClass: organizationalUnit
+ou: people
+description: User accounts
+
+dn: ou=groups,dc=jsbcai,dc=lab
+objectClass: organizationalUnit
+ou: groups
+description: Groups
