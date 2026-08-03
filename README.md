@@ -1,6 +1,10 @@
-# 🖧 Lab Ops — Systems, Storage & Security Challenge
+# 🖧 Lab Ops — Systems, Storage & Security Challenge · Grade 2
 
-**JSBCAI / Robotics Lab — Sysadmin Assistant Task**
+**JSBCAI / Robotics Lab — Sysadmin Assistant Task · Grade 2**
+
+> This is the **Grade 2** variant. Grade 1 is the same challenge with a
+> gentler Tier 2 extra-credit list. If you were sent here directly, this is
+> the one to do — do not go looking for the other branch.
 
 We already have a lab sysadmin. What we need is students who can take focused
 work off their plate — the tickets that eat an afternoon and do not need the
