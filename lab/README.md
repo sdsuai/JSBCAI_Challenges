@@ -106,8 +106,9 @@ Provisioning is idempotent, so re-running is safe.
 lab did not build. Reset, and if it persists, send the output to
 `philipamadasun1@gmail.com`.
 
-**Everything is slow.** That may be a ticket (see Part E) rather than your
-laptop. Check `tc qdisc show` on the server before you go hunting elsewhere.
+**Everything is slow.** Nothing in this grade deliberately slows the network,
+so suspect your laptop: check free RAM, and stop one VM while you work on the
+other (see Low-memory mode below).
 
 **You locked yourself out over SSH.** `multipass shell lab-server`. Then read
 your own runbook and notice whether it warned you.
@@ -121,6 +122,5 @@ On a 4 GB laptop:
 ```
 
 If that is still too tight, run the VMs one at a time — stop `lab-ws` while
-doing server-side work. It is slower and more annoying, but nothing in the
-challenge requires both to be running simultaneously except the NFS and
-throughput work in Parts B and E.
+doing server-side work. It is slower and more annoying, but the only part that
+needs both running at once is the NFS work in Part B.

@@ -20,7 +20,6 @@ volunteer actually gets asked to do:
 * Fix "I can't write to the shared folder" on an **NFS** mount, properly
 * Prove a **backup** can actually be restored from
 * **Harden SSH** and triage an auth log that has something wrong in it
-* Work out why the share got **slow**, and whether it is even the network
 * Write the **runbooks** so the next person does not have to ask you
 
 **You are allowed to use the internet and AI assistants (ChatGPT, Claude,
@@ -265,19 +264,7 @@ Follow-on from B1, and the second half most people miss. Explain in your
 runbook what a directory's setgid bit does, and why the default behaviour is
 wrong for a shared folder.
 
-#### B3 — "Some files on the share belong to 'svc-capture' and nobody knows why."
-
-> *From: bob — I made these files but they're not mine anymore. Did someone
-> change something? Have we been hacked?*
-
-Nobody was hacked. Two machines disagree about something.
-
-**Expected:** explain the actual mechanism in your runbook — specifically, what
-identifies a user in an NFS request. Then fix it. Renumbering one account is
-half an answer; the other half is what stops it happening again, and that is
-the half that connects this part to Part A.
-
-#### B4 — Explain `root_squash`
+#### B3 — Explain `root_squash`
 
 No ticket, just a question for your write-up. `root` on the workstation gets
 "permission denied" on files it appears to own. Why is that the default, what is
@@ -372,47 +359,6 @@ time, would have prevented this?**
 
 ---
 
-### Part E — Network and throughput
-
-#### E1 — Baseline
-
-Measure the link between `lab-ws` and `lab-server` with `iperf3`. Record
-throughput and round-trip latency. You cannot call something slow without a
-number for what fast was.
-
-#### E2 — Your actual wifi
-
-Measure your own laptop's wifi: throughput and latency to your router, and to
-something on the internet. Report the numbers.
-
-In your write-up: your wifi reports a link rate (say 866 Mbps). You will not
-measure anything close to it. Explain the gap — at least three distinct reasons,
-and be specific.
-
-#### E3 — ⚠️ "Copying from the share got really slow this week. Did the network die?"
-
-> *From: bob — Pulling a folder of scans takes forever now. One big file seems
-> fine though? Maybe it's my laptop.*
-
-Bob's observation is the clue, and it is the opposite of what most people
-assume.
-
-**Expected:** find the actual cause, and — this is the graded part — **show
-your method**. A candidate who tests with one large `dd` will measure a
-perfectly healthy link and conclude the problem is elsewhere. Your write-up must
-explain why one big file and 500 small files behave so differently over the same
-link, in terms of what NFS does per file.
-
-Then fix it, and note whether your fix survives a reboot.
-
-#### E4 — "Is it the network, the disk, or NFS?"
-
-Given a slow transfer, how do you tell those three apart? Write the decision
-procedure — the commands, in order, and what each result rules out. This is a
-runbook, and it is the most reusable thing you will produce in this challenge.
-
----
-
 ### Part F — Runbooks and write-up
 
 #### F1 — Runbooks
@@ -433,20 +379,16 @@ formality.
 
 Answer these in your own words. Short and concrete.
 
-1. **B4** — `root_squash`: what it protects against, and what `no_root_squash`
+1. **B3** — `root_squash`: what it protects against, and what `no_root_squash`
    would allow.
-2. **B3** — what actually identifies a user in an NFS request, and why that
-   makes a directory service necessary rather than merely convenient.
-3. **C1** — how a backup reported success every night for two weeks while
+2. **C1** — how a backup reported success every night for two weeks while
    backing up nothing. What class of bug is that, and where else does it hide?
-4. **C3** — how long your restore took, and what you would change to make it
+3. **C3** — how long your restore took, and what you would change to make it
    faster or safer.
-5. **E3** — why latency destroys a many-small-files copy but barely touches one
-   large file.
-6. **D3** — which earlier ticket would have prevented the incident.
-7. **A4** — what you did about dave, what you deliberately did not do, and what
+4. **D3** — which earlier ticket would have prevented the incident.
+5. **A4** — what you did about dave, what you deliberately did not do, and what
    you would have asked first.
-8. **The thing you got wrong** during this challenge, and how you found out.
+6. **The thing you got wrong** during this challenge, and how you found out.
    Everyone has one. Submissions claiming none read as submissions that did not
    check.
 
@@ -462,7 +404,7 @@ obvious when the write-up is not in the same voice as the video.
 **8–15 minutes.** Screen recording, your voice, everything run from a terminal.
 
 * Show `./lab/verify.sh` before and after your work
-* Walk through **two** tickets end to end — one diagnosis-heavy (B1, B3, or E3)
+* Walk through **two** tickets end to end — one diagnosis-heavy (B1 or C1)
   and **one where you stopped and asked** (A4 or C3)
 * Demonstrate the restore from C3 actually restoring
 * Show the SSH hardening, and say what you checked before restarting sshd
@@ -501,17 +443,16 @@ obvious when the write-up is not in the same voice as the video.
 | Category | Points | What we are looking at |
 | --- | --- | --- |
 | **Part A** — Identity and accounts | 15 | Reproducible LDIF, sane uid choices, verified access, careful offboarding |
-| **Part B** — Storage and permissions | 20 | Both causes found in B1, setgid understood, uid mechanism explained |
+| **Part B** — Storage and permissions | 15 | Both causes found in B1, setgid understood, `root_squash` explained |
 | **Part C** — Backups and restore | 20 | All three defects, loud failure, a real timed restore, safe restore path |
 | **Part D** — Hardening and triage | 20 | Each change justified, findings ranked by risk, incident report with an honest unknowns section |
-| **Part E** — Network and throughput | 15 | Correct method, latency-vs-bandwidth understood, reusable decision procedure |
 | **Judgment & blast radius** | 20 | `DECISIONS.md`. Did you notice the dangerous tickets? Did you stop? |
 | **Runbooks** | 10 | Followable by a stranger at 11pm |
 | **Write-up** | 10 | Concrete, own words, commits to answers |
 | **Video** | 15 | Required demos performed live, explains causes rather than commands |
-| | **145** | |
+| | **125** | |
 | **Extra credit Tier 1 / Tier 2** | +20 / +20 | |
-| | **185 max** | |
+| | **165 max** | |
 
 ### How we actually read a submission
 
@@ -563,7 +504,7 @@ templates/
 - [ ] `runbooks/` — one per ticket, committed *and* on the server
 - [ ] `DECISIONS.md` — including the three closing questions
 - [ ] `runbooks/INCIDENT.md` — timeline, cited, with an unknowns section
-- [ ] Write-up — all eight questions, your own words
+- [ ] Write-up — all six questions, your own words
 - [ ] Every fix committed as a file, not left inside a VM
 - [ ] **Your email address in your README**
 - [ ] Video — before/after `verify.sh`, two tickets end to end, live restore

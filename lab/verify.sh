@@ -112,8 +112,6 @@ check TICKET "a student can write to the share (B1)" "$WS" \
   "runuser -u carol -- test -w /mnt/shared"
 check TICKET "the share is setgid, so new files inherit the group (B2)" "$SERVER" \
   "[ -g /srv/lab/shared ]"
-check TICKET "uid 10002 means bob on both machines (B3)" "$WS" \
-  "getent passwd 10002 | grep -q '^bob:'"
 
 part "C" "backups and restore"
 check INFRA "a backup job exists" "$SERVER" \
@@ -138,12 +136,6 @@ check TICKET "MaxAuthTries is tightened (D1)" "$SERVER" \
   "v=\$(sshd -T 2>/dev/null | awk '/^maxauthtries/{print \$2}'); [ -n \"\$v\" ] && [ \"\$v\" -le 4 ]"
 check TICKET "an incident report was written (D3)" "$SERVER" \
   "test -s /srv/lab/shared/runbooks/INCIDENT.md"
-
-part "E" "network and throughput"
-check INFRA "iperf3 is installed on both hosts" "$WS" \
-  "command -v iperf3 >/dev/null"
-check TICKET "the artificial latency has been found and removed (E3)" "$SERVER" \
-  "! tc qdisc show | grep -q netem"
 
 part "F" "runbooks"
 check TICKET "runbooks directory exists with content (F1)" "$SERVER" \
