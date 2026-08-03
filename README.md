@@ -1,10 +1,12 @@
-# 🖧 Lab Ops — Systems, Storage & Security Challenge · Grade 2
+# 🖧 Lab Ops — Systems, Storage & Security Challenge · Grade 3
 
-**JSBCAI / Robotics Lab — Sysadmin Assistant Task · Grade 2**
+**JSBCAI / Robotics Lab — Sysadmin Assistant Task · Grade 3**
 
-> This is the **Grade 2** variant. Grade 1 is the same challenge with a
-> gentler Tier 2 extra-credit list. If you were sent here directly, this is
-> the one to do — do not go looking for the other branch.
+> This is the **Grade 3** variant — the hardest. It adds two faults that are
+> considerably harder to diagnose than anything in Grade 2, and it makes the
+> disaster-recovery drill **required** rather than extra credit. Grades 1 and 2
+> are lighter. If you were sent here directly, this is the one to do — do not go
+> looking for the other branches.
 
 We already have a lab sysadmin. What we need is students who can take focused
 work off their plate — the tickets that eat an afternoon and do not need the
@@ -161,7 +163,22 @@ today and reproduces the ticket next week is not a fix. When you close a ticket,
 you must be able to say what was actually wrong and why your change addresses
 it — not just what you typed.
 
-### 2. Judgment about blast radius
+### 2. Verify that your fix held
+
+New at this grade, and stated plainly because it is fair to warn you rather
+than merely catch you: **not everything in this lab stays fixed.**
+
+Something else on this server may own the state you just changed. A fix that
+goes green and then quietly reverts is worse than no fix at all, because now
+there is a closed ticket saying it works. Before you change a file, form the
+habit of asking what else writes to it — `crontab -l`, `ls /etc/cron.d/`,
+`systemctl list-timers`, and any configuration management. Then re-check your
+work later, not immediately.
+
+`./lab/verify.sh` is cheap. Run it again after you have moved on to something
+else.
+
+### 3. Judgment about blast radius
 
 Some tickets below are written the way real tickets are written: slightly
 ambiguous, and destructive if you do exactly what they say.
@@ -177,7 +194,7 @@ full marks on judgment by executing everything you were handed.
 This is the single most valuable trait in someone helping a sysadmin. Clever is
 common. Trustworthy with production data is not.
 
-### 3. Runbooks
+### 4. Runbooks
 
 Work that only you can repeat has not reduced anyone's workload. Every ticket
 you close gets a short runbook written for the next volunteer at 11pm when
@@ -277,7 +294,44 @@ identifies a user in an NFS request. Then fix it. Renumbering one account is
 half an answer; the other half is what stops it happening again, and that is
 the half that connects this part to Part A.
 
-#### B4 — Explain `root_squash`
+#### B4 — ⚠️ "The scratch area says it's full but there's loads of space."
+
+> *From: carol — I'm trying to write frame indexes to /srv/lab/scratch and I
+> get "No space left on device". But `df -h` says it's 5% used? I don't
+> understand what I'm looking at.*
+
+carol is reading the output correctly. The disk really does have space.
+
+**Expected:** find the actual resource that ran out, and explain in your runbook
+why the error message is the same for both cases. Then fix it — and note that
+freeing things up is only the immediate fix. Your runbook must say what changes
+so this does not recur in a month, because the underlying limit is fixed at
+creation time and deleting files does not raise it.
+
+A hint about method rather than answer: when a command's error contradicts what
+you think you know, suspect that the thing you are measuring is not the thing
+that ran out.
+
+#### B5 — ⚠️ "I fixed this yesterday and it's broken again."
+
+> *From: bob — you sorted out the shared drive on Monday and it worked. It's
+> back to permission denied this morning. Did the fix not take?*
+
+The fix took. Something undid it.
+
+**Expected:** find what is reverting your change, and understand **why it
+exists** before you touch it — it was written for a reason that was valid at
+the time. Then decide what is actually wrong: the enforcement, or the policy it
+enforces. Fix the right one.
+
+Deleting it because it is inconvenient is the wrong answer, and so is working
+around it. Your runbook must explain what it was for and why your change is
+safe, or the next person will simply put it back.
+
+This ticket is also the reason for the warning in *"Verify that your fix held"*
+above.
+
+#### B6 — Explain `root_squash`
 
 No ticket, just a question for your write-up. `root` on the workstation gets
 "permission denied" on files it appears to own. Why is that the default, what is
@@ -413,27 +467,75 @@ runbook, and it is the most reusable thing you will produce in this challenge.
 
 ---
 
-### Part F — Runbooks and write-up
+### Part F — Disaster recovery *(required at this grade)*
 
-#### F1 — Runbooks
+Extra credit in Grades 1 and 2. Required here, and weighted accordingly.
+
+#### F1 — ⚠️ "The server's gone."
+
+> *From: alice — lab-server is dead. Storage controller. It is not coming back.
+> How fast can you get us running again?*
+
+Run the drill:
+
+```bash
+./lab/disaster.sh
+```
+
+It destroys `lab-server` permanently and hands you back an **empty** Ubuntu VM.
+It deliberately does not run our provisioning scripts — rebuilding from
+`bootstrap.sh` would prove nothing, because that is our work. You rebuild from
+**yours**: your committed LDIF, your backup, your hardened config, your backup
+job, your runbooks.
+
+**Start a timer when it finishes. Stop it when `./lab/verify.sh` is green
+again** — every INFRA check and every ticket check.
+
+Do not tidy up first to make it go smoothly. If your backup is incomplete, the
+point is to find that out now. If a runbook says "restore the usual way", the
+point is to find that out now.
+
+**Expected:** `runbooks/DR-REPORT.md`, committed and placed at
+`/srv/lab/shared/runbooks/DR-REPORT.md`, containing:
+
+* **How long it took**, honestly, wall-clock.
+* **What you could not recover**, and what it would have cost the lab. There is
+  always something. A report claiming full recovery reads as a drill that was
+  quietly prepared for rather than actually run.
+* **Which of your runbooks failed you** — the step that was ambiguous at the
+  moment you needed it most.
+* **What you changed afterwards** so the next rebuild is faster.
+* **Your predicted time versus your actual time** (`disaster.sh` asks you to
+  write the prediction down before it destroys anything). The gap is
+  interesting and we will ask about it.
+
+> ⚠️ This is the only genuinely irreversible command in the challenge, and it is
+> irreversible on purpose. `lab-ws` also survives with stale mounts pointing at
+> exports that no longer exist — dealing with that is part of the drill.
+
+---
+
+### Part G — Runbooks and write-up
+
+#### G1 — Runbooks
 
 One per closed ticket, in `runbooks/`, from
 [`templates/RUNBOOK.md`](templates/RUNBOOK.md). Also place copies at
 `/srv/lab/shared/runbooks/` on the server. Short is good. **The test: could
 someone follow it without asking you a single question?**
 
-#### F2 — Decision log
+#### G2 — Decision log
 
 `DECISIONS.md`, from [`templates/DECISIONS.md`](templates/DECISIONS.md).
 Every moment you stopped, and every consequential thing you decided to proceed
 with. See "How this is graded" above — this is not optional and it is not a
 formality.
 
-#### F3 — Write-up
+#### G3 — Write-up
 
 Answer these in your own words. Short and concrete.
 
-1. **B4** — `root_squash`: what it protects against, and what `no_root_squash`
+1. **B6** — `root_squash`: what it protects against, and what `no_root_squash`
    would allow.
 2. **B3** — what actually identifies a user in an NFS request, and why that
    makes a directory service necessary rather than merely convenient.
@@ -444,9 +546,17 @@ Answer these in your own words. Short and concrete.
 5. **E3** — why latency destroys a many-small-files copy but barely touches one
    large file.
 6. **D3** — which earlier ticket would have prevented the incident.
-7. **A4** — what you did about dave, what you deliberately did not do, and what
-   you would have asked first.
-8. **The thing you got wrong** during this challenge, and how you found out.
+
+7. **B4** — the two finite resources a filesystem can exhaust, why they produce
+   the same error, and how you tell them apart in under ten seconds.
+
+8. **B5** — how long your B1 fix survived before it was reverted, how you found
+   what was reverting it, and how you decided which of the two to change.
+
+9. **F1** — the single thing that most slowed your rebuild.
+10. **A4** — what you did about dave, what you deliberately did not do, and what
+    you would have asked first.
+11. **The thing you got wrong** during this challenge, and how you found out.
    Everyone has one. Submissions claiming none read as submissions that did not
    check.
 
@@ -467,6 +577,9 @@ obvious when the write-up is not in the same voice as the video.
 * Demonstrate the restore from C3 actually restoring
 * Show the SSH hardening, and say what you checked before restarting sshd
 * Walk through your incident report against the log
+* **Show the disaster-recovery rebuild** — at minimum the destroyed server, and
+  `verify.sh` going green again afterwards. Timelapse or cuts are fine; say how
+  long it really took
 * Say what you would do next with another week
 
 ---
@@ -489,7 +602,7 @@ obvious when the write-up is not in the same voice as the video.
 
 | | Points | |
 | --- | --- | --- |
-| **Disaster recovery drill** | +15 | Destroy `lab-server` entirely. Rebuild it from your backups and committed config. **Time it**, and report what you discovered was missing — there is always something. The single most valuable item on this list. |
+| **Drift detection** | +12 | Write a checker that compares the live lab against a declared baseline — permissions, exports, sshd settings, group membership — and exits nonzero on any difference. Run it on a timer. This is the systemic answer to Ticket B5: instead of one script silently enforcing a stale policy, you get a declared expectation and a loud alarm when reality diverges. |
 | **LDAP over TLS** | +12 | Your own CA, certificate on the server, `ldaps://` enforced, anonymous bind restricted. Show the traffic encrypted before and after. |
 | **SSH certificate auth** | +10 | A small CA issuing short-lived user certificates instead of `authorized_keys`. Explain what this fixes about key management at lab scale. |
 | **Centralized logging** | +10 | Ship both VMs' logs to one place, so an attacker clearing local logs does not erase the evidence. Relate it to D3. |
@@ -501,17 +614,18 @@ obvious when the write-up is not in the same voice as the video.
 | Category | Points | What we are looking at |
 | --- | --- | --- |
 | **Part A** — Identity and accounts | 15 | Reproducible LDIF, sane uid choices, verified access, careful offboarding |
-| **Part B** — Storage and permissions | 20 | Both causes found in B1, setgid understood, uid mechanism explained |
+| **Part B** — Storage and permissions | 25 | Both causes found in B1, setgid understood, uid mechanism explained, inode exhaustion diagnosed, reverter found and reasoned about |
 | **Part C** — Backups and restore | 20 | All three defects, loud failure, a real timed restore, safe restore path |
 | **Part D** — Hardening and triage | 20 | Each change justified, findings ranked by risk, incident report with an honest unknowns section |
 | **Part E** — Network and throughput | 15 | Correct method, latency-vs-bandwidth understood, reusable decision procedure |
+| **Part F** — Disaster recovery | 20 | Rebuilt from own artifacts; honest report of what was lost; runbooks that survived contact |
 | **Judgment & blast radius** | 20 | `DECISIONS.md`. Did you notice the dangerous tickets? Did you stop? |
 | **Runbooks** | 10 | Followable by a stranger at 11pm |
 | **Write-up** | 10 | Concrete, own words, commits to answers |
 | **Video** | 15 | Required demos performed live, explains causes rather than commands |
-| | **145** | |
+| | **170** | |
 | **Extra credit Tier 1 / Tier 2** | +20 / +20 | |
-| | **185 max** | |
+| | **210 max** | |
 
 ### How we actually read a submission
 
@@ -523,6 +637,11 @@ obvious when the write-up is not in the same voice as the video.
    couldn't write *and* new files weren't inheriting the group, so fixing the
    first would have brought the ticket straight back" is.
 
+At this grade we also read **`DR-REPORT.md` immediately after `DECISIONS.md`**.
+A rebuild that went perfectly is not a good sign — it means the drill was
+prepared for rather than run. We are looking for the honest list of what could
+not be recovered.
+
 **Automatic point losses:**
 
 * Destroyed data a ticket did not authorize destroying, without flagging it
@@ -530,6 +649,8 @@ obvious when the write-up is not in the same voice as the video.
 * A ticket closed with no root cause stated
 * Runbooks that are shell history rather than instructions
 * Fixes that exist only inside a VM and are not committed anywhere
+* A B1 fix that has silently reverted by the time we look at it
+* `DR-REPORT.md` claiming nothing was lost, with no detail supporting it
 
 ---
 
@@ -543,6 +664,7 @@ lab/
   bootstrap.sh         build both VMs, provision, inject faults
   verify.sh            what works; separates lab breakage from your tickets
   reset.sh             destroy and rebuild
+  disaster.sh          Part G — destroys lab-server for real. Read it first.
   provision/           what gets installed on each VM
   seed/                initial directory contents (LDIF)
   faults/              spoilers — the deliberate breakage, explained
@@ -563,10 +685,12 @@ templates/
 - [ ] `runbooks/` — one per ticket, committed *and* on the server
 - [ ] `DECISIONS.md` — including the three closing questions
 - [ ] `runbooks/INCIDENT.md` — timeline, cited, with an unknowns section
-- [ ] Write-up — all eight questions, your own words
+- [ ] `runbooks/DR-REPORT.md` — real timing, honest list of what was lost
+- [ ] Your B1 fix is still holding — re-run `./lab/verify.sh` before you submit
+- [ ] Write-up — all eleven questions, your own words
 - [ ] Every fix committed as a file, not left inside a VM
 - [ ] **Your email address in your README**
-- [ ] Video — before/after `verify.sh`, two tickets end to end, live restore
+- [ ] Video — before/after `verify.sh`, two tickets end to end, live restore, the DR rebuild
 - [ ] It all still works after `./lab/reset.sh` and re-applying your work
 
 ---

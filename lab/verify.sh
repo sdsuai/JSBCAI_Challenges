@@ -114,6 +114,10 @@ check TICKET "the share is setgid, so new files inherit the group (B2)" "$SERVER
   "[ -g /srv/lab/shared ]"
 check TICKET "uid 10002 means bob on both machines (B3)" "$WS" \
   "getent passwd 10002 | grep -q '^bob:'"
+check TICKET "the scratch area can accept new files again (B4)" "$SERVER" \
+  "t=/srv/lab/scratch/.verify.\$\$; touch \$t 2>/dev/null && rm -f \$t"
+check TICKET "nothing is reverting the share permissions (B5)" "$SERVER" \
+  "! grep -rqs lab-perms-sync /etc/cron.d /etc/crontab /var/spool/cron 2>/dev/null"
 
 part "C" "backups and restore"
 check INFRA "a backup job exists" "$SERVER" \
@@ -145,8 +149,12 @@ check INFRA "iperf3 is installed on both hosts" "$WS" \
 check TICKET "the artificial latency has been found and removed (E3)" "$SERVER" \
   "! tc qdisc show | grep -q netem"
 
-part "F" "runbooks"
-check TICKET "runbooks directory exists with content (F1)" "$SERVER" \
+part "F" "disaster recovery"
+check TICKET "a DR report exists (F1)" "$SERVER" \
+  "test -s /srv/lab/shared/runbooks/DR-REPORT.md"
+
+part "G" "runbooks"
+check TICKET "runbooks directory exists with content (G1)" "$SERVER" \
   "find /srv/lab/shared/runbooks -name '*.md' 2>/dev/null | grep -q ."
 
 # --------------------------------------------------------------------------
@@ -175,6 +183,8 @@ fi
 if [ "$TICKET_FAIL" -gt 0 ]; then
   echo "Outstanding tickets above are the work. See the README for the context"
   echo "each one comes with — the check going green is not the whole answer."
+  echo
+  echo "At this grade, also re-run this LATER. Not everything stays fixed."
 else
   echo "All checks green. Make sure your runbooks and write-up are done too:"
   echo "several tickets ask for a root cause and a decision that no script can grade."

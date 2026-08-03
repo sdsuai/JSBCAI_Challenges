@@ -46,6 +46,7 @@ forgiving, and that is worth remembering while you edit `sshd_config`.
 | `bootstrap.sh` | builds both VMs, provisions them, injects the faults |
 | `verify.sh` | reports what works. Distinguishes lab breakage from your tickets |
 | `reset.sh` | destroys and rebuilds. Use it freely |
+| `disaster.sh` | **Part G.** Destroys `lab-server` for real and gives you a bare one. Read it before running it |
 | `provision/` | what gets installed and configured on each VM |
 | `seed/` | the initial directory contents (LDIF) |
 | `faults/` | **spoilers.** The deliberate breakage. See below |
@@ -66,6 +67,21 @@ diagnostic exercise into a typing exercise, and the video walkthrough will make
 it obvious which one you did. Afterwards they are genuinely worth reading —
 each explains the underlying mechanism in more depth than the ticket does.
 
+## Not everything stays fixed
+
+At this grade one of the faults is a job that periodically undoes a change you
+made. That is deliberate, it is a real failure mode, and it is why `verify.sh`
+is worth re-running some time after you think you are done rather than
+immediately after each fix.
+
+Before editing any file, it is worth knowing what else writes to it:
+
+```bash
+crontab -l; sudo crontab -l
+ls -la /etc/cron.d/ /etc/cron.*/
+systemctl list-timers --all
+```
+
 ## Common operations
 
 ```bash
@@ -79,6 +95,8 @@ multipass start lab-server lab-ws
 
 ./lab/reset.sh                   # clean slate, ~5 minutes
 ./lab/reset.sh --destroy         # tear down, do not rebuild
+
+./lab/disaster.sh                # Part G: destroy lab-server, keep nothing
 ```
 
 ## Keep your work outside the VMs
