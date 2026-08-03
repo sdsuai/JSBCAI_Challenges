@@ -11,6 +11,40 @@
    - **Please don't make me have to remake this repo again. In your ReadME, make sure to provide your email address.**
 * You may freely use any tool available to you to accomplish this task. The internet, ChatGPT, anything.
 
+## **Time commitment — 5 to 7 days**
+
+**This problem set is scoped to 5–7 days of real, active work.** Not five to
+seven calendar days with the tab open — five to seven days of actually sitting
+down and grinding on it.
+
+That window is deliberate, and meeting it is part of what we are measuring.
+
+Volunteering in this lab means taking real time out of your weeknights and your
+weekends, consistently, for work you have been assigned. That *is* the role. If
+you can carve out that time for this challenge, you can carve it out for the
+tasks we hand you once you are here. If you cannot, the fit is wrong — and it is
+far better for both of us to learn that now than three weeks into a project that
+is sitting blocked on you.
+
+To be direct, because you deserve to know what you are signing up for: this is
+not a role that works for someone who can look at their assignment once every
+two weeks. That is not a judgment about you or your priorities. Plenty of
+capable people are genuinely committed elsewhere — coursework, a job, family —
+and that is completely legitimate. It is simply not compatible with the pace
+this lab runs at, and pretending otherwise wastes your semester as well as ours.
+
+**If you cannot make the window, email `philipamadasun1@gmail.com` *before* it
+runs out**, explain why, and ask for more time. Real reasons exist — exam weeks,
+illness, work shifts, a laptop that died. Ask and explain, and I will decide
+whether the explanation warrants an extension. **Asking is never held against
+you.** Going quiet and surfacing late with no word is a different thing
+entirely, and it tells us what working with you would be like.
+
+If you run out of time, a solid Part A and Part B with a clear README beats
+a rushed robot policy — the policy is extra credit at this grade for exactly
+that reason. Say what you cut and why. Scoping under pressure is an engineering skill and we grade it as one.
+
+
 ## **Overview**
 
 In this project, you will use **YOLO** (You may use Ultralytics to perform:
