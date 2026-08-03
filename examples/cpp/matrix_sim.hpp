@@ -18,7 +18,7 @@
 // `Matrix` is the DRIVER INTERFACE: set_pixel / fill / show / close. A real
 // HUB75 panel is another implementation of the same four methods. Your
 // animation code must talk to the interface and must not know which backend it
-// is holding — that is worth marks in Part C.
+// is holding — that is worth marks in Part B.
 //
 //     Panel::Srgb  buffer holds perceptual sRGB, displayed as-is ("what a
 //                  monitor does"). Good for composing your layout.

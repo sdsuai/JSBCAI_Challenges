@@ -139,12 +139,12 @@ static int demo_easing(Panel panel) {
 // A legibility probe, not a design to copy.
 //
 // Stand up and walk 3 metres away. Squint. Can you still tell these three
-// states apart? That is the bar Part C has to clear, and it is why color alone
+// states apart? That is the bar Part B has to clear, and it is why color alone
 // will not save you: the shapes and the MOTION differ too, so the states
 // survive both distance and colorblindness.
 //
 // Note the pulse rate: 1.2 Hz, deliberately far below the 3-60 Hz band that
-// can trigger photosensitive seizures. See README Part C.
+// can trigger photosensitive seizures. See README Part B.
 static int demo_alarm(Panel panel) {
     struct St { const char* name; uint8_t c[3]; double hz; int kind; };  // kind 0 steady 1 pulse 2 sweep
     const St states[] = {

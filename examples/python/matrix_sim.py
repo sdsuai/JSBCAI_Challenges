@@ -28,7 +28,7 @@ it is holding. Write to the interface, not to this file.
                   real HUB75 panel, and converted for display. This is the
                   honest mode. Run your fade here and watch it rush to bright
                   and plateau — then fix it with gamma.build_lut(). See
-                  gamma.py, and Part C of the README.
+                  gamma.py, and the gamma extra credit in the README.
 
 USAGE
 -----
@@ -96,7 +96,7 @@ class Matrix:
 
     Implement these four methods against real hardware and every animation you
     wrote for the simulator keeps working, unchanged. That is the point of
-    having an interface, and it is worth marks in Part C.
+    having an interface, and it is worth marks in Part B.
     """
 
     def __init__(self, width: int = 64, height: int = 32):
@@ -406,12 +406,12 @@ def demo_alarm(args):
     """A legibility probe, not a design to copy.
 
     Stand up and walk 3 metres away from your screen. Squint. Can you still
-    tell these three states apart? That is the bar your Part C has to clear,
+    tell these three states apart? That is the bar your Part B has to clear,
     and it is why color alone will not save you: the shapes and the MOTION
     differ too, so the states survive both distance and colorblindness.
 
     Note the pulse rate: 1.2 Hz. Deliberately far below the 3-60 Hz band that
-    can trigger photosensitive seizures. See README Part C.
+    can trigger photosensitive seizures. See README Part B.
     """
     states = [
         ("NOMINAL",  (40, 200, 120), 0.30, "steady"),

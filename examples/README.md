@@ -13,13 +13,12 @@ Python reference, and vice versa.
 
 | Supports | Python | C++ |
 | -------- | ------ | --- |
-| **Part C** — LED matrix, driver interface, half-block renderer | `python/matrix_sim.py` | `cpp/matrix_sim.hpp` |
-| **Part C** — gamma / PWM vs perception | `python/gamma.py` | `cpp/gamma.hpp` |
-| **Part C** — easing, delta-time animation | `python/easing.py` | `cpp/easing.hpp` |
-| **Part C** — seizure-safety audit (flash rate) | `python/flash_audit.py` | *(use the Python tool; it reads a CSV either language can write)* |
-| **Parts A/B/C** — replaying the canonical timeline | `python/scenario_player.py` | `cpp/scenario.hpp` |
+| **Part B** — LED matrix, driver interface, half-block renderer | `python/matrix_sim.py` | `cpp/matrix_sim.hpp` |
+| *extra credit* — gamma / PWM vs perception | `python/gamma.py` | `cpp/gamma.hpp` |
+| **Part B** — easing, delta-time animation | `python/easing.py` | `cpp/easing.hpp` |
+| **Part B** — seizure-safety audit (flash rate) | `python/flash_audit.py` | *(use the Python tool; it reads a CSV either language can write)* |
+| **Parts A/B** — replaying the canonical timeline | `python/scenario_player.py` | `cpp/scenario.hpp` |
 | **Part A** — TUI mechanics: resize, too-small, NO_COLOR, non-blocking input | `python/tui_minimal.py` | `cpp/tui_minimal.cpp` |
-| **Part B** — GUI mechanics: worker thread, five interaction states, spacing scale | `python/gui_minimal.py` | *(pick your own toolkit — see below)* |
 | **Part 0 / accessibility** — WCAG contrast checking | `python/contrast.py` | `cpp/gamma.hpp` (`contrast_ratio`) |
 | reference — how `scenario.jsonl` was produced | `python/make_scenario.py` | — |
 
@@ -39,7 +38,7 @@ You should see three colored bars. If you see raw escape sequences instead, your
 terminal lacks 24-bit color — on Windows use Windows Terminal or WSL.
 
 Then run the four demos. They take about a minute total and they are the
-fastest way to understand what Part C is asking for:
+fastest way to understand what Part B is asking for:
 
 ```bash
 python3 matrix_sim.py --demo sweep      # capability check + delta-time loop
@@ -66,8 +65,6 @@ python3 scenario_player.py --at 58      # exact state at the E-STOP
 **Python** — the starters use only the standard library. There is no
 `pip install` step for anything required.
 
-- `gui_minimal.py` uses `tkinter`, bundled with Python on Windows and macOS.
-  On Debian/Ubuntu/WSL: `sudo apt install python3-tk`.
 - `tui_minimal.py` uses `curses`, bundled on macOS and Linux. On Windows:
   run it under WSL, or `pip install windows-curses`.
 - `requirements.txt` lists only the OPTIONAL libraries some people prefer.
@@ -89,12 +86,11 @@ matrix work.
 These are conveniences, not constraints. Other perfectly good choices:
 
 - **TUI** — Python: `rich`, `textual`, `blessed`. C++: ncurses, FTXUI, notcurses.
-- **GUI** — Python: PySide6/PyQt, Dear PyGui, Kivy. C++: Qt, Dear ImGui, FLTK, raylib, nanogui.
 - **Matrix** — any renderer you like, including a real panel if you own one
   (extra credit). Keep the driver interface so the simulator still works, because
   we have to be able to run your submission without your hardware.
 
 What you may **not** do is skip the parts these files exist to make easy —
-the resize handling, the worker thread, the gamma correction, the flash audit.
+the resize handling, the non-blocking input, the flash audit.
 They are requirements, and the starters are there so they cost you an hour
 instead of a weekend.

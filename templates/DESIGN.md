@@ -18,7 +18,7 @@ Aim for 500–1000 words plus sketches. Longer is not better.
 
 ## 1. Who is looking at this?
 
-One paragraph per surface. Be specific and physical, not aspirational.
+One paragraph per surface (TUI and LED matrix). Be specific and physical, not aspirational.
 
 For each: **who** is looking, from **how far**, for **how long**, **how often**,
 in what **lighting**, and **what else are they doing** at the time. "A user who
@@ -27,7 +27,6 @@ for 2 seconds every 30 seconds while walking alongside the rover, outdoors in
 daylight, holding a controller in both hands" is.
 
 - **TUI:**
-- **GUI:**
 - **LED matrix:**
 
 ## 2. The 300-millisecond question
@@ -39,7 +38,6 @@ Name one thing per surface. Not two. If your answer is a list, you have not
 made the decision yet, and the design will show it.
 
 - **TUI:**
-- **GUI:**
 - **LED matrix:**
 
 Then: **what did you sacrifice to make that thing primary?** Something got
@@ -62,9 +60,9 @@ idea does not fit, and it is much cheaper than discovering it in code.
 
 The scenario gives you raw state and no severity ranking. Define yours.
 
-| condition | severity | how it is shown (TUI) | (GUI) | (matrix) |
-| --- | --- | --- | --- | --- |
-| | | | | |
+| condition | severity | how it is shown (TUI) | (matrix) |
+| --- | --- | --- | --- |
+| | | | |
 
 Then answer:
 
@@ -78,7 +76,7 @@ Then answer:
 ## 5. Design tokens
 
 Where your shared token file lives, and what is in it. Colors, timings, spacing,
-severity names. All three surfaces must consume it.
+severity names. Both surfaces must consume it.
 
 - **File:**
 - **How each surface consumes it:**
@@ -101,7 +99,7 @@ shape, position, motion, or text?
 
 ## 7. The E-STOP question
 
-Does your GUI's E-STOP button ask for confirmation before firing?
+Does your TUI's E-STOP key ask for confirmation before firing?
 
 Answer yes or no, and defend it in a short paragraph. Consider: what does the
 operator's hand do in the half-second before they hit it; what is the cost of
@@ -124,7 +122,7 @@ Written **after** you built it. Where did the plan meet reality and lose?
 
 - Something you were sure about that turned out wrong when you saw it running:
 - Something you cut, and what it cost:
-- The surface that was hardest, and why:
+- The surface that was harder, and why:
 - What you would do differently with another week:
 
 Honesty scores here. Every real design changes on contact with the screen; a
