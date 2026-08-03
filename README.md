@@ -18,6 +18,11 @@ Most coding challenges tell you whether someone can build what they were told
 to build. This one is designed to tell us whether you can *decide what to
 build* when nobody specifies the layout — because that is the job.
 
+**You are allowed to use the internet and AI assistants (ChatGPT, Claude,
+Copilot, Gemini, etc.).** What matters is your **design decisions**, your
+**implementation**, and the **video explanation** you submit. Use whatever gets
+you there.
+
 ---
 
 ## ‼️ Important — read this whole section
@@ -37,6 +42,13 @@ build* when nobody specifies the layout — because that is the job.
   On Windows that is PowerShell (there's another shell too, I think); on macOS
   and Linux a common one is bash. Your OS might use a different terminal from
   what I mentioned, or might have several — doesn't matter, just use one.
+* **On Windows, we recommend you work in WSL** (Windows Subsystem for Linux).
+  Not required — everything here runs natively on Windows too — but WSL gives
+  you the same environment the lab actually runs on, makes both TUI starters
+  work with no extra packages, and means every install command in this repo is
+  the one you'll type. If you plan to volunteer here, you will end up using
+  Linux anyway; setting it up now is an hour well spent. `wsl --install` in an
+  admin PowerShell, then use Windows Terminal.
 * **After completing this task you will need to screen record a video** showing
   that your code works and you explaining how it works. Obviously, in the screen
   recording you MUST run your programs from the terminal.
@@ -121,6 +133,25 @@ The two ⚠️ TUI rows are the only real friction, they affect the *starter* ra
 than the assignment, and each has a one-line fix. Your own TUI may use any
 library you like — `rich`/`textual` (Python) and FTXUI (C++) are fully
 cross-platform with no system packages at all.
+
+### 🪟 Windows users: WSL is recommended
+
+Every ⚠️ in the Windows column disappears under WSL, and there is a bigger
+reason than convenience: **the lab runs on Linux.** If you join us, that is the
+environment you will be working in, so the hour you spend setting up WSL now is
+an hour you were going to spend eventually — and it means every install command
+in this repo is exactly the one you type.
+
+```powershell
+wsl --install          # admin PowerShell, then reboot
+```
+
+Then open Ubuntu from Windows Terminal and work from there.
+
+To be clear: **this is a recommendation, not a requirement.** Native Windows is
+fully supported, the simulator handles the console setup for you, and a native
+Windows submission is graded identically. If WSL fights you, drop it and move on
+— finishing the challenge matters far more than which shell you finished it in.
 
 **Terminal requirement:** you need 24-bit ("truecolor") support, which every
 current terminal has — Windows Terminal, iTerm2, macOS Terminal, GNOME Terminal,
@@ -218,6 +249,12 @@ Then read [`scenario/SCHEMA.md`](scenario/SCHEMA.md) and
    * Demonstrate any extra credit you did
 
 3. **A write-up** (in your README or `WRITEUP.md`) answering the Part D questions.
+
+You may use AI tools throughout — but your submission must reflect **your own
+design decisions, structure, debugging, and judgment**. The video is where that
+becomes obvious, in both directions: a candidate who leaned on AI and
+understands every choice they shipped does great, and a candidate who cannot
+explain why their own matrix pulses at 1.2 Hz does not.
 
 ---
 
@@ -407,9 +444,15 @@ means, what pulsing means, or which corner the important thing lives in.
 
 ## ✍️ Part D — Write-up *(required)*
 
-Short, concrete, in your own words. **No AI-generated essays** — this is the
-section where we find out whether you understood what you built, and it is
-extremely obvious when it is not your voice.
+Short, concrete, and **in your own words**.
+
+You were told to use AI freely for the build, and that stands. This one section
+is the exception, and for a practical reason rather than a moral one: it is the
+only place we find out whether *you* understood the thing you shipped. A
+generated essay about your design tells us nothing we can act on, and it is
+extremely obvious when the write-up is not in the same voice as the video.
+
+Rough and specific beats polished and generic here. Bullet points are fine.
 
 1. **The 300 ms question.** For each surface: what is the one thing legible
    before the viewer focuses, and what did you sacrifice for it?
