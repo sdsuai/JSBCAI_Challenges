@@ -1,6 +1,10 @@
-# 🎛 One System, Three Surfaces — UX & Interface Design Challenge
+# 🎛 One System, Three Surfaces — UX & Interface Design Challenge · Grade 2
 
-**JSBCAI / Robotics Lab — Interface & Interaction Design Task**
+**JSBCAI / Robotics Lab — Interface & Interaction Design Task · Grade 2**
+
+> This is the **Grade 2** variant: three surfaces (TUI, GUI, LED matrix).
+> Grade 1 is the same challenge with two surfaces. If you were sent here
+> directly, this is the one to do — do not go looking for the other branch.
 
 This challenge evaluates your ability to **design an interface**, not just build
 one. Specifically:
