@@ -1,0 +1,510 @@
+# 🎛 One System, Three Surfaces — UX & Interface Design Challenge
+
+**JSBCAI / Robotics Lab — Interface & Interaction Design Task**
+
+This challenge evaluates your ability to **design an interface**, not just build
+one. Specifically:
+
+* Information hierarchy under hard constraints
+* TUI design (terminal, keyboard-only)
+* GUI design (desktop, mouse + keyboard)
+* LED matrix animation design (64×32 RGB, no text, viewed from across a room)
+* Animation timing, easing, and gamma
+* Accessibility and failure states
+* Cross-surface consistency via shared design tokens
+* Being able to **defend your decisions out loud**
+
+Most coding challenges tell you whether someone can build what they were told
+to build. This one is designed to tell us whether you can *decide what to
+build* when nobody specifies the layout — because that is the job.
+
+---
+
+## ‼️ Important — read this whole section
+
+* **You must code in Python and/or C++.** We prefer C++ — our lab's rendering
+  and hardware work is C++ — but **a Python submission is graded on exactly the
+  same rubric with no penalty and no bonus.** Choose the language you can design
+  best in. Every starter we ship exists in both.
+* **You do not need an LED matrix.** You are not assumed to own any hardware at
+  all. The matrix is simulated in your terminal with zero dependencies (see
+  Part C). If you *do* own a panel, that is extra credit — never a requirement.
+* **This runs on any laptop.** macOS, Linux, Windows, WSL. No GPU, no network,
+  no accounts, nothing to buy. If your machine can run a terminal and a compiler
+  or Python, you can do all of this.
+* **Everything runs from your OS terminal.** Windows: PowerShell or Windows
+  Terminal (or WSL). macOS/Linux: bash/zsh. In your screen recording you MUST
+  launch your programs from a terminal.
+* **You may freely use any tool available to you** — the internet, ChatGPT,
+  Claude, Copilot, anything. What we assess is your *design judgment*, your
+  *implementation*, and your *video explanation*. Be aware that AI tools are
+  quite bad at the specific thing we are testing here: they will happily give
+  you a layout that shows everything at once, which is exactly the failure mode
+  this challenge is built to detect.
+* **Time expectation:** a focused week. If you are past two weeks, you have
+  over-built — cut scope, finish, and say what you cut in your write-up.
+
+### 📮 Submission — READ THE ENTIRE BULLET
+
+* **Submit a pull request to this repo** so we have your GitHub username and can
+  find your work. **Do not do your actual work in the public forked repo** —
+  others can copy it.
+* **Make a private clone** (or however you make things private) of the fork and
+  do your real work there.
+* **Send an invite to the private repo to `philipamadasun1@gmail.com`** so we can
+  get access.
+* **Put your email address in your README.** Please don't make us go looking.
+* Name the repo something identifiable, e.g. `JSB_ux_design_challenge`.
+
+---
+
+## 📦 Overview
+
+You will build **one robot status-and-control console, three times**:
+
+| Part | Surface | Constraint that makes it interesting |
+| ---- | ------- | ------------------------------------ |
+| **Part 0** | Design intent + wireframes | Decide before you build |
+| **Part A** | **TUI** — terminal, keyboard-only | Monospace cells, resizes under you, may have no color at all |
+| **Part B** | **GUI** — desktop window | Mouse *and* keyboard, must never freeze, needs real interaction states |
+| **Part C** | **LED matrix** — 64×32 RGB | 2048 pixels. No text. Viewed from 3 metres. Physically linear light |
+| **Part D** | Write-up and video | Defend it |
+
+All three read **the same canonical timeline** — `scenario/scenario.jsonl`, a
+106-second replay of a rover's mission that includes a transient fault, two
+simultaneous faults, an emergency stop, and a recovery. Every candidate is
+graded on the same events, so submissions are directly comparable.
+
+### Why three surfaces
+
+Because the interesting part is the **translation**.
+
+Anybody can put fifteen numbers on a screen. The skill we are hiring for shows
+up when the screen is 64×32 pixels, has no room for text, and is being looked at
+from across a lab by someone holding a controller — and you have to decide what
+survives.
+
+A candidate who shrinks their GUI onto the matrix fails visibly. A candidate who
+re-encodes the state into color, shape, and motion — and can explain why they
+dropped the other twelve numbers — is who we are looking for.
+
+> **The single most common way to fail this challenge is to show everything.**
+> Three surfaces that all display the same twelve fields at different sizes is
+> not three designs. It is one design, rendered three times, and it means the
+> hierarchy decisions were never made.
+
+---
+
+## 🚀 Start here (about 10 minutes)
+
+```bash
+git clone <your private repo>
+cd <repo>
+
+# 1. Can your terminal do this? (three colored bars = yes)
+cd examples/python && python3 matrix_sim.py --demo probe
+#   ...or C++:
+cd examples/cpp && make && ./demo probe
+
+# 2. The four demos. Run all of them — they ARE the brief for Part C.
+python3 matrix_sim.py --demo sweep     #   ./demo sweep
+python3 matrix_sim.py --demo gamma     #   ./demo gamma     <-- especially this
+python3 matrix_sim.py --demo easing    #   ./demo easing
+python3 matrix_sim.py --demo alarm     #   ./demo alarm
+
+# 3. The timeline you will design against
+python3 scenario_player.py --list      #   ./demo scenario
+```
+
+Then read [`scenario/SCHEMA.md`](scenario/SCHEMA.md) and
+[`examples/README.md`](examples/README.md).
+
+---
+
+## 🎯 Deliverables
+
+1. **A GitHub repository** containing:
+   * Source for all three surfaces
+   * A **shared design-token file** consumed by all three
+   * `DESIGN.md` (Part 0 — start from [`templates/DESIGN.md`](templates/DESIGN.md))
+   * `README.md` with setup + run instructions **and your email address**
+   * `run.sh` / `run.ps1` / `make run` that launches each surface
+
+2. **A 6–12 minute walkthrough video** (screen recording with your voice):
+   * Run all three surfaces from a terminal, replaying the scenario **at 1× speed**
+   * **Resize your terminal while the TUI is running**, live
+   * **Run the TUI with `NO_COLOR=1`**, live
+   * **Tab through your GUI using only the keyboard** — no mouse — and show focus moving
+   * Show the matrix during the **E-STOP at t=58** and during **two-faults-at-once at t=55**
+   * Show your `--panel led` gamma before/after
+   * Walk 3 metres back from the screen with the matrix running, on camera
+   * For each surface, say **what you chose to leave out, and why**
+   * Demonstrate any extra credit you did
+
+3. **A write-up** (in your README or `WRITEUP.md`) answering the Part D questions.
+
+---
+
+## 📐 Part 0 — Design before code *(required)*
+
+Before you write any implementation code, produce **`DESIGN.md`**. Copy
+[`templates/DESIGN.md`](templates/DESIGN.md) and fill in every section.
+
+It must contain:
+
+* **A viewer model per surface.** Who is looking, from how far, for how long,
+  in what lighting, and what else are their hands and eyes doing. Be physical
+  and specific.
+* **The 300 ms question, answered once per surface.** What is the ONE thing
+  legible before the viewer has focused? One thing. Not a list.
+* **What you sacrificed** to make that thing primary. Something must have gotten
+  smaller or dimmer. Name it.
+* **Wireframes**, one per surface. Photos of paper sketches are ideal and
+  explicitly preferred over polished mockups. **Sketch the matrix on an actual
+  64×32 grid** — graph paper or a spreadsheet with square cells. This will save
+  you a day.
+* **Your severity model.** The scenario deliberately gives you *no* alarm or
+  priority field (see [SCHEMA.md](scenario/SCHEMA.md)). Define what counts as an
+  alarm, and how you rank two that fire at once.
+
+Then build. Then, at the end, add the **"What changed"** section honestly —
+where the plan met the screen and lost. We can tell the difference between a
+design doc written first and one retro-fitted afterwards, and the honest one
+scores higher even when the plan was wrong.
+
+> Part 0 is 15 points. It is the highest points-per-hour in the challenge and
+> the section most people skip. Do not skip it.
+
+---
+
+## ⌨️ Part A — The TUI *(required)*
+
+A terminal interface, driven **entirely by keyboard**, replaying the scenario.
+
+### Requirements
+
+1. **Survives resize.** Handle terminal resize (`KEY_RESIZE` / `SIGWINCH`) and
+   reflow. Dragging the window edge must never leave the layout corrupt. *We
+   will do this while watching your video.*
+2. **Degrades honestly when too small.** Below your minimum usable size, say so
+   in words and recover the instant there is room. A garbled screen and a crash
+   both score zero.
+3. **Works with no color at all.** `NO_COLOR=1` must produce a fully usable
+   interface, and so must a monochrome terminal. **No state may be conveyed by
+   color alone** — every severity needs a text, shape, or position cue too.
+   Roughly 1 in 12 men has a color vision deficiency; your operator may also be
+   on a washed-out projector in daylight.
+4. **Never blocks.** Non-blocking input; the display keeps updating while a key
+   is held. Input to visible feedback under ~100 ms.
+5. **Discoverable keys.** A `?` help overlay. `Esc` always backs out of whatever
+   you are in. Consistent bindings — if `q` quits at the top level it does not
+   mean something else three screens down.
+6. **State and events are visually distinct.** Current state and the event log
+   are different things (see SCHEMA.md) and must not look identical.
+7. **Fits and works at 80×24.** It may use more space well, but 80×24 must be
+   usable, not merely non-crashing.
+
+Starter mechanics for all of this: `examples/python/tui_minimal.py`,
+`examples/cpp/tui_minimal.cpp`. They are deliberately ugly — they solve the
+plumbing so you can spend your time on the design.
+
+---
+
+## 🖱 Part B — The GUI *(required)*
+
+A desktop window. Same data, same semantics, different medium.
+
+### Requirements
+
+1. **Never freezes.** Scenario replay runs off the UI thread; the UI thread only
+   renders. A window that stops repainting is the single most common way a
+   student GUI reads as broken. Any operation over ~200 ms must show progress.
+2. **Five states on every interactive control**: default, hover, focus
+   (keyboard), active (pressed), disabled. Focus must be **visually distinct
+   from hover** — a keyboard user has to see where they are.
+3. **Fully keyboard-navigable.** Tab order is sensible, Enter/Space activate,
+   and nothing is reachable by mouse only. *You will demonstrate this in the
+   video with your hands off the mouse.*
+4. **Disabled means disabled.** A greyed-out control that still fires is worse
+   than one that was never greyed out.
+5. **A spacing and type scale.** Every gap is a multiple of one step; you have
+   two or three type sizes, not nine. When we ask "why is that gap 13 pixels?"
+   the answer must not be "it looked right".
+6. **Resizes sensibly.** Define a minimum size. Decide what stretches and what
+   stays fixed, and make that a deliberate choice you can name.
+7. **An E-STOP control.** Whether it confirms first is **your call** — see
+   Part D. Whatever you choose, the video must show it and you must defend it.
+
+Starter mechanics: `examples/python/gui_minimal.py` (tkinter, stdlib, nothing to
+install on Windows/macOS). Qt, Dear ImGui, Dear PyGui, FLTK, raylib, and friends
+are all equally welcome — several are nicer.
+
+---
+
+## 💡 Part C — The LED matrix *(required — the heart of the challenge)*
+
+A **64×32 RGB** animated display. **2048 pixels. No text.** Assume it is
+mounted on the rover and read from **3 metres away** by someone who is doing
+something else.
+
+**You do not need hardware.** `matrix_sim.py` / `matrix_sim.hpp` render a matrix
+in your terminal using Unicode half-blocks — the glyph `▀` paints its foreground
+color on the top half of a character cell and its background on the bottom, so
+one character is two pixels and a 64×32 panel fits in 64 columns × 16 rows of an
+ordinary terminal. No windowing library, no pygame, no SDL, nothing to install.
+
+### Requirements
+
+1. **A driver interface.** Your animation code talks to
+   `set_pixel / fill / show / close` and must not know whether it is holding the
+   simulator or a real HUB75 panel. Swapping the backend must require zero
+   changes to your animation code.
+2. **Frame-rate-independent animation.** Animate against a measured clock and a
+   real delta time. `for i in range(60): draw(i/60); sleep(1/60)` runs at a
+   different speed on every machine and stutters whenever anything else blocks.
+3. **Real easing.** At least three different curves, each chosen for a reason
+   you state in `DESIGN.md`. Linear motion everywhere is the tell of an
+   animation nobody designed.
+4. **Gamma correction — and prove it.** PWM duty cycle is linear in *photons*;
+   your eye is not. A linear ramp written straight to a panel rushes to bright
+   in the first third and then barely changes. Run `--demo gamma` to see it, then
+   run **your own** fade under `panel="led"` and show the before/after in your
+   video. Build a LUT once; do not call `pow()` per pixel per frame.
+5. **No color-only encoding.** Assume your viewer is colorblind, or that the
+   panel's reds have drifted. Every state must also differ in **shape or
+   motion**. A greyscale screenshot of your matrix must still be readable.
+6. **Flash safety — this is a hard requirement, not a style note.** **No
+   full-field luminance flashing between 3 Hz and 60 Hz.** Photosensitive
+   seizures are triggered in exactly that band, worst around 15–20 Hz, and WCAG
+   2.3.1 sets the threshold at three flashes per second. Pulse alarms at ≤2 Hz,
+   or convey urgency with motion or shape instead. Record a trace and audit it:
+
+   ```python
+   m = TerminalMatrix(64, 32, luma_log="trace.csv")   # then, after your run:
+   ```
+   ```bash
+   python3 examples/python/flash_audit.py trace.csv   # must PASS
+   ```
+
+   Paste the output in `DESIGN.md`. A slow pulse also reads as *more* serious
+   than a strobe, so this constraint costs you nothing.
+7. **The E-STOP must be unmistakable at 3 metres**, with no text available.
+8. **Two simultaneous faults (t=52–58) must both be visible**, with one clearly
+   dominant.
+
+### The test that matters
+
+Stand up. Walk three metres from your screen. Squint.
+
+If you cannot tell `NOMINAL` from `DEGRADED` from `FAULT` in under a second,
+the design is not finished — regardless of how good it looks at your desk.
+`--demo alarm` shows the bar you are clearing.
+
+---
+
+## 🔗 Cross-cutting requirement — one design system *(required)*
+
+All three surfaces must consume **one shared design-token file** (JSON, YAML,
+a header, a module — your choice). It holds semantic names, not scattered
+literals: `fault`, not `#e04b45` typed in eleven places.
+
+Changing `fault` in that one file must change all three surfaces. That is the
+test of whether you built a system or three lookalike programs.
+
+Check your palette before you ship:
+
+```bash
+python3 examples/python/contrast.py --palette your_tokens.json
+```
+
+Every foreground must clear **3.0:1** against every surface it can land on, and
+body text should clear **4.5:1**. See `examples/tokens.example.json` for the
+shape (it is an example, not a palette to copy — yours should differ and you
+should be able to say why).
+
+The three surfaces will not *look* the same — a terminal cell, a desktop widget,
+and an LED pixel are different media and pretending otherwise is its own
+mistake. But a viewer moving between them should never have to relearn what red
+means, what pulsing means, or which corner the important thing lives in.
+
+---
+
+## ✍️ Part D — Write-up *(required)*
+
+Short, concrete, in your own words. **No AI-generated essays** — this is the
+section where we find out whether you understood what you built, and it is
+extremely obvious when it is not your voice.
+
+1. **The 300 ms question.** For each surface: what is the one thing legible
+   before the viewer focuses, and what did you sacrifice for it?
+
+2. **Two faults at once.** At t=52–58 the battery is under 20% *and* the lidar
+   is dying. Which did you rank higher, and why? What does the loser look like
+   while the winner has priority?
+
+3. **The transient.** The comms dropout at t=26 lasts 3.6 seconds. What does the
+   operator see during it, and thirty seconds later? What is your rule for how
+   long a resolved fault stays visible — and what happens if it flaps ten times
+   in a minute?
+
+4. **The E-STOP.** Does your GUI confirm before firing? Argue your side.
+   Consider what the operator's hand is doing in the half-second before they hit
+   it, the cost of firing it by accident, the cost of a dialog when it was *not*
+   an accident, and whether "are you sure?" is a real safeguard or a reflex
+   click. There is a defensible answer either way; there is no defensible
+   non-answer.
+
+5. **Boot is not a fault.** At t=0–6 all three sensors read down. That is normal
+   startup. How did you keep your UI from crying wolf — and why does that matter
+   for whether the operator believes you at t=55?
+
+6. **Gamma.** Explain in your own words why a linear PWM ramp looks wrong on a
+   panel but a linear sRGB ramp looks fine on your monitor. What would break if
+   you applied your gamma LUT twice?
+
+7. **What you would do with another week.**
+
+---
+
+## 🛠 Extra Credit *(optional — pick what interests you)*
+
+### 🟦 Tier 1 — laptop-friendly
+
+| | Points | |
+| --- | --- | --- |
+| **Colorblind simulation** | +8 | Add a mode that filters your own UI through deuteranopia/protanopia/tritanopia simulation. **Then fix what it breaks** and show the before/after. Finding nothing to fix means you are not looking hard enough. |
+| **Reduced motion** | +6 | A `--reduce-motion` flag that keeps every state distinguishable with animation off. Vestibular disorders are real, and it is a good test of whether motion was carrying meaning or decoration. |
+| **Contrast in CI** | +5 | Wire `contrast.py --palette` into a pre-commit hook or GitHub Action so a failing palette breaks the build. |
+| **Longest-string test** | +6 | Run every label through a pseudo-locale that inflates string length ~40% (German-style). Nothing may clip, overlap, or reflow into nonsense. |
+| **Custom pixel font** | +10 | Design your own 3×5 or 4×6 font for the matrix. Include a legibility test at 3 m and say which glyph pairs you had to redesign (`8`/`B`, `5`/`S`, `0`/`O`, `1`/`I`). |
+| **Latency instrumentation** | +8 | Measure input → visible-pixel latency in the TUI and GUI. Report p50 and p99, not a mean. Say which is worse and why. |
+| **Cross-language surface** | +10 | Implement one surface in the *other* language against the same token file, matching semantics. |
+| **Sonification** | +6 | Design audio cues for state changes. Distinguishable without looking, non-annoying at ten repetitions, and silenceable. |
+
+### 🟧 Tier 2 — harder
+
+| | Points | |
+| --- | --- | --- |
+| **Real usability test** | +15 | Two people who have never seen your UI. Give them the scenario and timed tasks ("tell me when the robot is in trouble"). Report what they got wrong, and **make one change because of it** and show it. This is the single most valuable thing on this list. |
+| **Real hardware** | +12 | If you own a matrix (HUB75, WS2812, Adafruit, Pimoroni, Pi, ESP32, Arduino), implement the driver backend and film it running. **Your simulator backend must still work** — we have to run your submission without your hardware. |
+| **Live-reloading tokens** | +8 | Edit the token file and watch all three surfaces update without restarting. Demo it on camera. |
+| **Matrix compositor** | +10 | Layers with alpha, z-order, and independent transitions, instead of drawing straight to the framebuffer. Show a layer fading over another. |
+
+---
+
+## 🧨 Grading Rubric
+
+| Category | Points | What we are looking at |
+| --- | --- | --- |
+| **Part 0** — Design intent, wireframes, severity model | 15 | Specific viewer model; a real hierarchy decision; honest "what changed" |
+| **Part A** — TUI | 20 | Resize, too-small, `NO_COLOR`, non-blocking, discoverability, 80×24 |
+| **Part B** — GUI | 20 | Five interaction states, keyboard-complete, never freezes, real spacing scale |
+| **Part C** — LED matrix | 30 | Legible at 3 m; driver interface; delta-time animation; easing; gamma proven; **flash audit passes**; no color-only encoding |
+| **Cross-surface design system** | 10 | One token file, actually shared; contrast check passes; consistent semantics |
+| **Part D** — Write-up | 10 | Concrete, in your own words, commits to answers |
+| **Video walkthrough** | 15 | Required demos performed live; explains *what was left out and why* |
+| | **120** | |
+| **Extra credit Tier 1** | +20 max | |
+| **Extra credit Tier 2** | +20 max | |
+| | **160 max** | |
+
+### How we actually read a submission
+
+Three things carry more weight than anything else, and none of them is code
+quality:
+
+1. **Did you leave things out?** Three surfaces showing the same twelve fields
+   means the hierarchy decisions were never made. We look for what is *missing*
+   from the matrix first.
+2. **Does `DESIGN.md` match what you built** — and where it does not, did you
+   say so? An honest "I was wrong about this and here is what I changed" scores
+   higher than a document quietly rewritten to match.
+3. **Can you defend it in the video?** "It looked better" is not a reason.
+   "The operator is glancing for two seconds while walking, so battery state had
+   to survive peripheral vision, which is why it is the only thing that moves"
+   is a reason. We would rather hear a defensible wrong answer than an
+   undefended right one.
+
+**Automatic point losses** — every one of these is a two-minute check we run
+before anything else:
+
+* Matrix flash audit fails (3–60 Hz full-field) — Part C capped at half marks
+* Any state distinguishable only by color, on any surface
+* TUI corrupts on resize, or is unusable under `NO_COLOR=1`
+* GUI freezes during any operation, or has mouse-only controls
+* No shared token file, or one that exists but is not actually consumed by all three
+* Video does not show all three surfaces replaying the scenario at 1×
+
+---
+
+## 🗂 What's in this repo
+
+```
+README.md                     this file
+scenario/
+  scenario.jsonl              the canonical timeline — 531 ticks, 5 Hz, 106 s
+  SCHEMA.md                   field reference + the five moments you are judged on
+templates/
+  DESIGN.md                   Part 0 skeleton — copy this to your repo root
+examples/
+  README.md                   index: which starter supports which requirement
+  requirements.txt            OPTIONAL libraries only; nothing here is required
+  tokens.example.json         example design-token file (an example, not a palette)
+  python/
+    matrix_sim.py             LED matrix simulator + driver interface + 5 demos
+    gamma.py                  PWM vs perception; the LUT
+    easing.py                 easing curves + delta-time Tween
+    scenario_player.py        pull-based timeline replay
+    tui_minimal.py            TUI mechanics: resize, too-small, NO_COLOR, non-blocking
+    gui_minimal.py            GUI mechanics: worker thread, 5 states, spacing scale
+    contrast.py               WCAG contrast checker (exits nonzero — CI-friendly)
+    flash_audit.py            seizure-safety audit of a recorded luminance trace
+    make_scenario.py          how scenario.jsonl was generated
+  cpp/
+    matrix_sim.hpp            same simulator, header-only, no dependencies
+    gamma.hpp  easing.hpp     same maths, byte-identical output
+    scenario.hpp              same player; parses the JSONL with no JSON library
+    tui_minimal.cpp           same TUI mechanics, ncurses
+    demo.cpp                  the same five demos
+    Makefile                  `make` → ./demo   |   `make tui` → ./tui_minimal
+```
+
+---
+
+## ✅ Final submission checklist
+
+**Required**
+
+- [ ] `DESIGN.md`, written before you built, with the "what changed" section added after
+- [ ] Wireframes for all three surfaces, including the matrix sketched on a real 64×32 grid
+- [ ] TUI: survives resize, handles too-small, fully usable with `NO_COLOR=1`, `?` help, works at 80×24
+- [ ] GUI: five interaction states, fully keyboard-navigable, never freezes, spacing scale
+- [ ] Matrix: driver interface, delta-time animation, ≥3 easing curves, gamma proven, legible at 3 m
+- [ ] **`flash_audit.py` output pasted in `DESIGN.md` and it PASSES**
+- [ ] Every state distinguishable **without color** on **all three** surfaces
+- [ ] One shared token file, genuinely consumed by all three
+- [ ] `contrast.py --palette` output pasted, and passing
+- [ ] Part D write-up, in your own words
+- [ ] `run.sh` / `run.ps1` / `make run`
+- [ ] **Your email address in your README**
+- [ ] Video: all three surfaces at 1×, live resize, live `NO_COLOR`, keyboard-only GUI pass, E-STOP on the matrix, gamma before/after, and the 3-metre walk-back
+
+**Optional**
+
+- [ ] Colorblind simulation · reduced motion · contrast in CI · longest-string test
+- [ ] Custom pixel font · latency p50/p99 · cross-language surface · sonification
+- [ ] Usability test with two humans · real hardware · live-reloading tokens · compositor
+
+---
+
+## 🧭 A closing note
+
+If you find yourself stuck on *what to show* rather than *how to show it*, you
+are in exactly the right place — that is the actual problem, and it is why this
+challenge exists. Go back to Part 0, pick your one 300-millisecond thing, and
+let everything else be secondary to it.
+
+And if you run out of time: **ship three finished surfaces that each do one
+thing well** rather than three half-built ones that try to do everything. Say
+what you cut and why in your write-up. That is a design decision too, and we
+will read it as one.

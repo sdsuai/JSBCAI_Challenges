@@ -1,0 +1,69 @@
+{
+  "_comment": [
+    "An EXAMPLE design-token file, not a palette to copy. Yours should differ,",
+    "and you should be able to say why each value is what it is.",
+    "",
+    "The point of a file like this is that it is the ONE place a color, a",
+    "duration, or a spacing step is defined, and all three surfaces read it.",
+    "The TUI maps these to the nearest terminal color, the GUI uses them",
+    "directly, the matrix uses them as sRGB and gamma-encodes on the way to the",
+    "panel. Change 'fault' here and all three change together — that is the",
+    "test of whether you really have a system or three lookalike programs.",
+    "",
+    "Check it before you ship:  python3 contrast.py --palette tokens.json",
+    "(exits nonzero if any token falls below 3.0:1 against the background)"
+  ],
+
+  "_surfaces_comment": [
+    "Every background a foreground token can land on. contrast.py checks each",
+    "color against ALL of them and reports the worst case, because that is the",
+    "one your operator will actually hit."
+  ],
+  "surfaces": {
+    "bg":      "#12141a",
+    "surface": "#1b1f28"
+  },
+
+  "colors": {
+    "text":     "#e6e9ef",
+    "text_dim": "#8b93a7",
+    "nominal":  "#39c07a",
+    "degraded": "#e0a12c",
+    "fault":    "#e04b45",
+    "focus":    "#5aa9ff"
+  },
+
+  "non_color_encoding": {
+    "_comment": "Every severity must survive a greyscale screenshot.",
+    "nominal":  {"mark": "[ OK ]",  "shape": "filled bar",   "motion": "still"},
+    "degraded": {"mark": "[WARN]",  "shape": "hollow bar",   "motion": "1.2 Hz pulse"},
+    "fault":    {"mark": "[FAIL]",  "shape": "hollow + X",   "motion": "1.2 Hz pulse + sweep"}
+  },
+
+  "spacing": {
+    "_comment": "One step, everything a multiple of it. 8 is conventional.",
+    "step": 8,
+    "scale": [8, 16, 24, 48]
+  },
+
+  "type": {
+    "_comment": "Two or three sizes, consistently used, read as designed.",
+    "small": 9,
+    "body": 12,
+    "display": 22
+  },
+
+  "motion_ms": {
+    "_comment": "Durations in milliseconds. Anything over ~400 on a status change needs defending.",
+    "instant": 0,
+    "fast": 120,
+    "normal": 240,
+    "slow": 400,
+    "pulse_hz": 1.2
+  },
+
+  "thresholds": {
+    "battery_low_pct": 20,
+    "battery_critical_pct": 8
+  }
+}

@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# C++ build output
+examples/cpp/demo
+examples/cpp/tui_minimal
+*.o
+*.obj
+*.exe
+*.out
+
+# Candidate artifacts that should not be committed
+trace.csv
+*.luma.csv
+frames/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

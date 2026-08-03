@@ -1,0 +1,27 @@
+# NOTHING HERE IS REQUIRED.
+#
+# Every starter in examples/python/ runs on the Python standard library alone.
+# This file lists optional libraries that some people prefer for their own
+# implementation. Install none, some, or all of them.
+#
+#     pip install -r examples/requirements.txt
+#
+# Platform notes for the two STDLIB modules that are not always present:
+#   curses  — bundled on macOS/Linux. On Windows: `pip install windows-curses`
+#             or run under WSL.
+#   tkinter — bundled on Windows/macOS. On Debian/Ubuntu/WSL:
+#             `sudo apt install python3-tk` (it is an OS package, not a pip one).
+
+# --- TUI alternatives to curses -------------------------------------------
+rich>=13.0            # styled terminal output, tables, live regions
+textual>=0.50         # full TUI framework built on rich; has a layout system
+
+# --- GUI alternatives to tkinter ------------------------------------------
+PySide6>=6.5          # Qt bindings. Heavy download, but a real widget toolkit
+dearpygui>=1.10       # immediate-mode GUI, fast, good for live telemetry
+
+# --- if you want a windowed matrix instead of the terminal one ------------
+pygame>=2.5           # simple pixel surface; useful if you prefer a real window
+
+# --- Windows only, if you use the curses starter --------------------------
+windows-curses>=2.3 ; sys_platform == "win32"
