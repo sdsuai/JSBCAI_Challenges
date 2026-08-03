@@ -1,10 +1,12 @@
-# 🎛 One System, Three Surfaces — UX & Interface Design Challenge · Grade 2
+# 🎛 One System, Three Surfaces — UX & Interface Design Challenge · Grade 3
 
-**JSBCAI / Robotics Lab — Interface & Interaction Design Task · Grade 2**
+**JSBCAI / Robotics Lab — Interface & Interaction Design Task · Grade 3**
 
-> This is the **Grade 2** variant: three surfaces (TUI, GUI, LED matrix).
-> Grade 1 is the same challenge with two surfaces. If you were sent here
-> directly, this is the one to do — do not go looking for the other branch.
+> This is the **Grade 3** variant — the hardest. Same three surfaces as Grade 2,
+> plus a **second, hold-out scenario you do not get to design for**, and a
+> **usability test with two real humans** which is required rather than extra
+> credit. Grades 1 and 2 are lighter. If you were sent here directly, this is
+> the one to do — do not go looking for the other branches.
 
 This challenge evaluates your ability to **design an interface**, not just build
 one. Specifically:
@@ -16,6 +18,7 @@ one. Specifically:
 * Animation timing, easing, and gamma
 * Accessibility and failure states
 * Cross-surface consistency via shared design tokens
+* Designing for data you have not seen, and for data that has stopped arriving
 * Being able to **defend your decisions out loud**
 
 Most coding challenges tell you whether someone can build what they were told
@@ -186,6 +189,30 @@ All three read **the same canonical timeline** — `scenario/scenario.jsonl`, a
 simultaneous faults, an emergency stop, and a recovery. Every candidate is
 graded on the same events, so submissions are directly comparable.
 
+### And a second one you do not get to design for
+
+`scenario/scenario-b.jsonl` is the **hold-out**. Same schema, different mission,
+and deliberately nastier. Your surfaces must handle it **without
+special-casing**, and your video must show them doing so.
+
+It contains three things scenario A never does:
+
+1. **The feed stops.** No ticks at all for 21.6 seconds. `poll()` keeps
+   returning the last sample it saw, nothing errors, and your UI will
+   confidently display a 21-second-old battery reading — while the real robot
+   has stopped, lost half its remaining charge, and gone into emergency stop.
+   **A display that cannot tell "true now" from "true 21 seconds ago" is lying,
+   and the more polished it looks the more convincingly it lies.**
+2. **An unknown state.** `STRANDED` appears at t=96 and exists nowhere in
+   scenario A. Do not crash, do not render blank, and do not show the previous
+   state as if nothing happened.
+3. **Faults that never recover.** The IMU dies at t=24 and stays dead. If your
+   severity model assumes faults are transient, this is where that shows.
+
+Read [`scenario/SCHEMA.md`](scenario/SCHEMA.md) for the full breakdown. The
+point of a hold-out is simple: it separates a design that was *designed* from
+one that was *tuned to a demo*.
+
 ### Why three surfaces
 
 Because the interesting part is the **translation**.
@@ -223,8 +250,9 @@ python3 matrix_sim.py --demo gamma     #   ./demo gamma     <-- especially this
 python3 matrix_sim.py --demo easing    #   ./demo easing
 python3 matrix_sim.py --demo alarm     #   ./demo alarm
 
-# 3. The timeline you will design against
+# 3. The timelines — the second one is the hold-out
 python3 scenario_player.py --list      #   ./demo scenario
+python3 scenario_player.py --list --file ../../scenario/scenario-b.jsonl
 ```
 
 Then read [`scenario/SCHEMA.md`](scenario/SCHEMA.md) and
@@ -242,7 +270,9 @@ Then read [`scenario/SCHEMA.md`](scenario/SCHEMA.md) and
    * `run.sh` / `run.ps1` / `make run` that launches each surface
 
 2. **A 6–12 minute walkthrough video** (screen recording with your voice):
-   * Run all three surfaces from a terminal, replaying the scenario **at 1× speed**
+   * Run all three surfaces from a terminal, replaying **scenario A at 1× speed**
+   * Then run **scenario B** on at least the TUI and the matrix, and show what
+     each does during the 21-second stall and at `STRANDED`
    * **Resize your terminal while the TUI is running**, live
    * **Run the TUI with `NO_COLOR=1`**, live
    * **Tab through your GUI using only the keyboard** — no mouse — and show focus moving
@@ -250,9 +280,14 @@ Then read [`scenario/SCHEMA.md`](scenario/SCHEMA.md) and
    * Show your `--panel led` gamma before/after
    * Walk 3 metres back from the screen with the matrix running, on camera
    * For each surface, say **what you chose to leave out, and why**
+   * Show a clip or summary of your **usability test**, including the change you
+     made because of it
    * Demonstrate any extra credit you did
 
-3. **A write-up** (in your README or `WRITEUP.md`) answering the Part D questions.
+3. **A usability test report** — `USABILITY.md`, from
+   [`templates/USABILITY.md`](templates/USABILITY.md). See Part D.
+
+4. **A write-up** (in your README or `WRITEUP.md`) answering the Part E questions.
 
 You may use AI tools throughout — but your submission must reflect **your own
 design decisions, structure, debugging, and judgment**. The video is where that
@@ -320,6 +355,10 @@ A terminal interface, driven **entirely by keyboard**, replaying the scenario.
    are different things (see SCHEMA.md) and must not look identical.
 7. **Fits and works at 80×24.** It may use more space well, but 80×24 must be
    usable, not merely non-crashing.
+8. **Handles stale and unknown data.** Run it against `scenario-b.jsonl`. When
+   the feed stalls, the operator must be able to tell that what they are seeing
+   is old — and when `STRANDED` arrives, the display must not break or silently
+   show the previous state.
 
 Starter mechanics for all of this: `examples/python/tui_minimal.py`,
 `examples/cpp/tui_minimal.cpp`. They are deliberately ugly — they solve the
@@ -350,7 +389,9 @@ A desktop window. Same data, same semantics, different medium.
 6. **Resizes sensibly.** Define a minimum size. Decide what stretches and what
    stays fixed, and make that a deliberate choice you can name.
 7. **An E-STOP control.** Whether it confirms first is **your call** — see
-   Part D. Whatever you choose, the video must show it and you must defend it.
+   Part E. Whatever you choose, the video must show it and you must defend it.
+8. **Handles stale and unknown data**, as in Part A. On a GUI you have room to
+   be explicit about it; use it.
 
 Starter mechanics: `examples/python/gui_minimal.py` (tkinter, stdlib, nothing to
 install on Windows/macOS). Qt, Dear ImGui, Dear PyGui, FLTK, raylib, and friends
@@ -408,6 +449,14 @@ ordinary terminal. No windowing library, no pygame, no SDL, nothing to install.
 7. **The E-STOP must be unmistakable at 3 metres**, with no text available.
 8. **Two simultaneous faults (t=52–58) must both be visible**, with one clearly
    dominant.
+9. **Stale data must be unmistakable at 3 metres.** This is the hardest single
+   requirement in the challenge. You have 2048 pixels, no text, and you must
+   communicate "I have stopped knowing" — which is a different message from
+   "everything is fine" and from "something is wrong". Freezing the display is
+   the one thing you certainly must not do, because a frozen display of good
+   news is indistinguishable from good news.
+10. **`STRANDED` must render as something**, and that something must not be
+    mistakable for a state you designed for.
 
 ### The test that matters
 
@@ -446,7 +495,47 @@ means, what pulsing means, or which corner the important thing lives in.
 
 ---
 
-## ✍️ Part D — Write-up *(required)*
+## 👥 Part D — Usability test *(required at this grade)*
+
+Extra credit in Grades 1 and 2. Required here, and weighted accordingly.
+
+**Two people who have never seen your design.** Twenty minutes each. Give them
+tasks, watch, and change something because of what you saw.
+
+Use [`templates/USABILITY.md`](templates/USABILITY.md) and submit it as
+`USABILITY.md`.
+
+### The rules that make it worth doing
+
+1. **Do not explain your design.** Not one sentence. The moment you say "the bar
+   on the left is battery", the test is over and you have learned nothing.
+2. **Do not help when they get stuck.** Say "what do you think you'd do?" and
+   stay quiet. The silence is uncomfortable and it is where the data is.
+3. **Do not defend.** Write down what they say. Arguing produces a participant
+   who stops telling you things.
+4. **Watch what they do, not what they say.** People are polite. The signal is
+   where their eyes go, how long they take, and what they get wrong.
+
+### Required
+
+* Both participants, the same tasks, in the same order, at 1× speed
+* **Time to correct answer** per task, or "never"
+* A section on **what they got wrong** — and for each mistake, what in your
+  design made that mistake reasonable. The answer is never "they weren't paying
+  attention"; they were reading your design and it told them something you did
+  not intend
+* Verbatim quotes, **including the unflattering ones**
+* **At least one real change made because of what you saw**, with before/after
+
+> A report concluding "the test confirmed my design works" scores near zero —
+> not because the design is bad, but because a test that changed nothing was a
+> demonstration, not a test. Everyone's design confuses a stranger somewhere.
+> Finding where is the entire point, and it is the cheapest design win
+> available to you.
+
+---
+
+## ✍️ Part E — Write-up *(required)*
 
 Short, concrete, and **in your own words**.
 
@@ -470,22 +559,31 @@ Rough and specific beats polished and generic here. Bullet points are fine.
    long a resolved fault stays visible — and what happens if it flaps ten times
    in a minute?
 
-4. **The E-STOP.** Does your GUI confirm before firing? Argue your side.
+4. **Stale data.** What does each surface do during scenario B's 21-second
+   stall, and why did you choose that? What is the *worst* thing a status
+   display can do when its data stops arriving, and why?
+
+5. **The unknown state.** How does each surface render `STRANDED`? What is your
+   general rule for values you did not anticipate?
+
+6. **The usability test.** What surprised you most, and what did you change?
+
+7. **The E-STOP.** Does your GUI confirm before firing? Argue your side.
    Consider what the operator's hand is doing in the half-second before they hit
    it, the cost of firing it by accident, the cost of a dialog when it was *not*
    an accident, and whether "are you sure?" is a real safeguard or a reflex
    click. There is a defensible answer either way; there is no defensible
    non-answer.
 
-5. **Boot is not a fault.** At t=0–6 all three sensors read down. That is normal
+8. **Boot is not a fault.** At t=0–6 all three sensors read down. That is normal
    startup. How did you keep your UI from crying wolf — and why does that matter
    for whether the operator believes you at t=55?
 
-6. **Gamma.** Explain in your own words why a linear PWM ramp looks wrong on a
+9. **Gamma.** Explain in your own words why a linear PWM ramp looks wrong on a
    panel but a linear sRGB ramp looks fine on your monitor. What would break if
    you applied your gamma LUT twice?
 
-7. **What you would do with another week.**
+10. **What you would do with another week.**
 
 ---
 
@@ -495,6 +593,7 @@ Rough and specific beats polished and generic here. Bullet points are fine.
 
 | | Points | |
 | --- | --- | --- |
+| **Adversarial scenario** | +8 | Author a third timeline specifically designed to break *your own* design. Show it breaking on video, then fix it. Finding nothing that breaks it means you have not tried hard enough. |
 | **Colorblind simulation** | +8 | Add a mode that filters your own UI through deuteranopia/protanopia/tritanopia simulation. **Then fix what it breaks** and show the before/after. Finding nothing to fix means you are not looking hard enough. |
 | **Reduced motion** | +6 | A `--reduce-motion` flag that keeps every state distinguishable with animation off. Vestibular disorders are real, and it is a good test of whether motion was carrying meaning or decoration. |
 | **Contrast in CI** | +5 | Wire `contrast.py --palette` into a pre-commit hook or GitHub Action so a failing palette breaks the build. |
@@ -508,7 +607,7 @@ Rough and specific beats polished and generic here. Bullet points are fine.
 
 | | Points | |
 | --- | --- | --- |
-| **Real usability test** | +15 | Two people who have never seen your UI. Give them the scenario and timed tasks ("tell me when the robot is in trouble"). Report what they got wrong, and **make one change because of it** and show it. This is the single most valuable thing on this list. |
+| **Fleet view** | +15 | Three robots on the one 64×32 panel instead of one. You cannot show three of anything at that size, so decide what survives — and defend it. The hardest pure information-design problem available here. |
 | **Real hardware** | +12 | If you own a matrix (HUB75, WS2812, Adafruit, Pimoroni, Pi, ESP32, Arduino), implement the driver backend and film it running. **Your simulator backend must still work** — we have to run your submission without your hardware. |
 | **Live-reloading tokens** | +8 | Edit the token file and watch all three surfaces update without restarting. Demo it on camera. |
 | **Matrix compositor** | +10 | Layers with alpha, z-order, and independent transitions, instead of drawing straight to the framebuffer. Show a layer fading over another. |
@@ -524,12 +623,14 @@ Rough and specific beats polished and generic here. Bullet points are fine.
 | **Part B** — GUI | 20 | Five interaction states, keyboard-complete, never freezes, real spacing scale |
 | **Part C** — LED matrix | 30 | Legible at 3 m; driver interface; delta-time animation; easing; gamma proven; **flash audit passes**; no color-only encoding |
 | **Cross-surface design system** | 10 | One token file, actually shared; contrast check passes; consistent semantics |
-| **Part D** — Write-up | 10 | Concrete, in your own words, commits to answers |
+| **Generality** — the hold-out scenario | 20 | Stale data made visible on all three surfaces; `STRANDED` handled; no special-casing |
+| **Part D** — Usability test | 20 | Real strangers, honest failures, a change made and shown |
+| **Part E** — Write-up | 10 | Concrete, in your own words, commits to answers |
 | **Video walkthrough** | 15 | Required demos performed live; explains *what was left out and why* |
-| | **120** | |
+| | **160** | |
 | **Extra credit Tier 1** | +20 max | |
 | **Extra credit Tier 2** | +20 max | |
-| | **160 max** | |
+| | **200 max** | |
 
 ### How we actually read a submission
 
@@ -548,6 +649,10 @@ quality:
    is a reason. We would rather hear a defensible wrong answer than an
    undefended right one.
 
+At this grade we also read **`USABILITY.md` first**, before we look at the
+design itself. A test where nothing went wrong is treated as a test that was not
+really run.
+
 **Automatic point losses** — every one of these is a two-minute check we run
 before anything else:
 
@@ -557,6 +662,9 @@ before anything else:
 * GUI freezes during any operation, or has mouse-only controls
 * No shared token file, or one that exists but is not actually consumed by all three
 * Video does not show all three surfaces replaying the scenario at 1×
+* Any surface that special-cases scenario B instead of handling it generally
+* A display that shows stale data as though it were live
+* `USABILITY.md` missing, or reporting that nothing needed changing
 
 ---
 
@@ -566,9 +674,11 @@ before anything else:
 README.md                     this file
 scenario/
   scenario.jsonl              the canonical timeline — 531 ticks, 5 Hz, 106 s
-  SCHEMA.md                   field reference + the five moments you are judged on
+  scenario-b.jsonl            the HOLD-OUT — 392 ticks, a 21.6 s feed stall
+  SCHEMA.md                   field reference, both timelines, what each tests
 templates/
   DESIGN.md                   Part 0 skeleton — copy this to your repo root
+  USABILITY.md                Part D skeleton — the usability test report
 examples/
   README.md                   index: which starter supports which requirement
   requirements.txt            OPTIONAL libraries only; nothing here is required
@@ -613,16 +723,18 @@ examples/
 - [ ] Every state distinguishable **without color** on **all three** surfaces
 - [ ] One shared token file, genuinely consumed by all three
 - [ ] `contrast.py --palette` output pasted, and passing
-- [ ] Part D write-up, in your own words
+- [ ] Both surfaces handle `scenario-b.jsonl` — stale data visible, `STRANDED` safe
+- [ ] `USABILITY.md` — two strangers, timed tasks, and a change you actually made
+- [ ] Part E write-up, in your own words
 - [ ] `run.sh` / `run.ps1` / `make run`
 - [ ] **Your email address in your README**
-- [ ] Video: all three surfaces at 1×, live resize, live `NO_COLOR`, keyboard-only GUI pass, E-STOP on the matrix, gamma before/after, and the 3-metre walk-back
+- [ ] Video: all three surfaces at 1×, live resize, live `NO_COLOR`, keyboard-only GUI pass, E-STOP on the matrix, gamma before/after, the 3-metre walk-back, **scenario B's stall**, and your usability change
 
 **Optional**
 
 - [ ] Colorblind simulation · reduced motion · contrast in CI · longest-string test
 - [ ] Custom pixel font · latency p50/p99 · cross-language surface · sonification
-- [ ] Usability test with two humans · real hardware · live-reloading tokens · compositor
+- [ ] Adversarial scenario · fleet view · real hardware · live-reloading tokens · compositor
 
 ---
 
