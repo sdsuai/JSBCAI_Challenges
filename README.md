@@ -1,9 +1,16 @@
 
-# **Assignment: YOLO Object Tracking, Object Relations, and a Simple “Robot Policy”**
+# **Assignment: YOLO Object Tracking, Object Relations, and a Simple “Robot Policy” — Grade 3**
+
+> **This is the Grade 3 variant — the hardest.** Grade 2 added the memory work
+> (section 4). Grade 3 makes the **robot policy required** rather than extra
+> credit, and adds **section 5: real-time behaviour and policy safety** — the
+> part where the policy has to survive a pipeline that is slower than the
+> camera and a detector that is sometimes wrong. Grades 1 and 2 are lighter.
+> If you were sent here directly, this is the one to do.
 
 * This task will require you to run your code from your machines OS **terminal**. For windows, its the powershell (there's another shell too I think), for macOS and Linux machines a common terminal is bash. Your OS might be using a different terminal from what I mentioned, or might have multiple, doesn't matter, just use one.
 * After completing this task you will need to screen record to make a video showing that your code works and you explaining how it works. Obviously in the screen recording you MUST run your program from the terminal.
-* Create a github repo containing your code and the video. Name the repo something like "JSB_grade_2_interview_problem" or something like that so it's identifiable.
+* Create a github repo containing your code and the video. Name the repo something like "JSB_grade_3_interview_problem" or something like that so it's identifiable.
 * **IMPORTANT (READ THE ENTIRE BULLET POINT) For submission you must:**
    - **submit a pull request to this repo so that we have access to your username and get find your repo. However, so others don't copy your work, do not do you work in the public forked repo.**
    - **Make a private clone (or however you make things private) of the forked repo and do your actual work there.**
@@ -23,14 +30,19 @@ In this project, you will use **YOLO** (You may use Ultralytics to perform:
    * Left/right relationship
    * Approaching / moving away
 
-(Optional **Tier 2 / Extra Credit**):
-
-4. Implement a simple **robot policy** that outputs actions based on what the “robot” sees.
+4. **Robot policy** — actions chosen from what the "robot" sees.
+   **Required at this grade** (extra credit in Grades 1 and 2.)
 
    * No physical robot required
    * All logic simulated through code
 
+5. **Real-time behaviour and policy safety** — new at this grade. Measuring how
+   old your data is when you act on it, dropping frames instead of falling
+   behind, and making sure the policy fails safe when perception does not.
+
 You will also instrument your pipeline's **CPU RAM and GPU VRAM usage** and demonstrate that you understand how differently the two behave — the OS silently pages CPU memory to disk, while VRAM is yours to manage explicitly. See **Memory Management (section 4)**.
+
+Then you will make it behave in real time. A tracker that is correct but 1.8 s behind is not a slow robot, it is a robot steering by where things used to be — and the failure is silent, because nothing errors and the frame rate looks fine. See **Real-Time Behaviour & Policy Safety (section 5)**.
 
 You must use **your own video(s)** — either recorded by yourself or found online.
 
@@ -201,9 +213,13 @@ frame, objectA_id, objectB_id, distance, side, relation
 
 ---
 
-## **3. Tier 2 (Extra Credit): Simple Robot Policy**
+## **3. Robot Policy (REQUIRED at this grade)**
 
 Design a **robot controller** that chooses an action for each frame.
+
+This is extra credit in Grades 1 and 2 and required here, because section 5
+below is entirely about making it safe — and you cannot harden a policy you
+have not written.
 
 ### **Choose One Task (or propose your own)**
 
@@ -371,7 +387,168 @@ Answer in your README, in your own words (short and concrete beats long and vagu
 
 ---
 
-# **5. Documentation (README.md Requirements)**
+# **5. Real-Time Behaviour & Policy Safety**
+
+Section 4 was about running out of *memory*. This one is about running out of
+*time*, and it is the difference between a pipeline that works on a video file
+and one you would let near a real machine.
+
+The core idea, which every requirement below circles:
+
+> **A detection is only useful if it is still true.** Everything your pipeline
+> does — decode, inference, tracking, relations, policy — happens *after* the
+> moment the frame was captured. By the time you act, the world has moved on.
+> How far it moved is a number you can measure, and almost nobody does.
+
+**Starters, all runnable in seconds with no GPU, no model download and no
+video:** `examples/latency_probe.py` (D1), `examples/realtime_loop.py` (D2),
+`examples/policy_safety.py` (D3) and `examples/degrade_video.py` (D4). Run the
+first three back to back before you write anything — together they take about
+thirty seconds and they *are* the brief for this section.
+
+---
+
+## **D1 — Latency budget (required)**
+
+Instrument your own pipeline per stage: decode, inference, tracking, relations,
+policy.
+
+**Report percentiles, not averages.** "30 FPS" is a mean, and means hide the
+thing a robot cares about. If 99 frames take 20 ms and one takes 900 ms, the
+average is a healthy 29 ms and the robot still drove blind for nearly a second.
+
+**Deliverables:**
+
+1. `latency.csv` — per-frame, per-stage timings
+2. A table of **p50 / p95 / p99 / max** for every stage and for end-to-end
+3. **The age of the data your policy acted on** — capture to action, including
+   any time the frame spent waiting in a queue. This is the headline number of
+   the whole section
+4. Your **p99 ÷ p50 ratio**, and an explanation of what causes the tail in
+   *your* pipeline
+
+In your write-up: which stage dominates, and did that match your guess before
+you measured?
+
+---
+
+## **D2 — Real-time or bust: drop frames, do not queue them (required)**
+
+Your camera produces frames at a fixed rate. YOLO does not care. When the
+pipeline is slower than the source, you get exactly two choices:
+
+* **Queue everything.** Nothing is lost, the backlog grows forever, and every
+  frame you process is older than the last.
+* **Drop the oldest.** You process fewer frames, and every one you *do* process
+  is the newest available. Age stays bounded no matter how long you run.
+
+For a recording pipeline the first is right. For a robot the second is right,
+and it is not a compromise: **a stale frame has negative value**, because you
+will confidently act on the past.
+
+> **You have already met this bug.** In C2, an unbounded list between a fast
+> producer and a slow consumer ate RAM. Here, an unbounded queue between a fast
+> producer and a slow consumer eats *time*. Same shape, different resource:
+> **unbounded buffer + producer faster than consumer = something grows without
+> bound.** Naming that general rule is worth marks.
+
+**Deliverables:**
+
+1. A bounded, drop-oldest hand-off between frame capture and inference —
+   capacity one or two. `examples/realtime_loop.py` shows the mechanism
+2. A run where inference is genuinely slower than the source (use a longer
+   video, a bigger model, or `--work-ms` in the starter to prove the shape)
+3. **One plot, two curves**: data age over time, queued vs drop-oldest. The
+   queued curve climbs; the dropped one is flat
+4. Frames processed and frames dropped for both. Note that throughput is
+   usually about the *same* — you did not lose work, you lost lag
+
+> ⚠️ If you use OpenCV's `cap.read()`, note it pulls from a driver-side buffer
+> that queues **for** you. A slow loop silently accumulates lag even though your
+> code contains no queue at all. Finding that is part of the exercise.
+
+---
+
+## **D3 — Policy safety (required)**
+
+Your policy from section 3 is correct on clean data. Now make it safe on real
+data. `examples/policy_safety.py` implements all four mechanisms with a runnable
+before/after.
+
+**Required behaviours:**
+
+1. **Deadband / hysteresis.** A person sitting exactly on your turn threshold
+   makes a naive policy emit `TURN_LEFT, ALIGNED, TURN_LEFT, ALIGNED` at 30 Hz.
+   Use two thresholds: a wide one to start turning, a narrow one to stop.
+2. **Staleness watchdog.** If the tracked object has not been seen for a while,
+   the policy must fall back to a safe action — **not** keep steering toward the
+   last known position. It must be measured in **seconds, not frames**: your
+   frame rate varies (see D1/D2), so "10 frames" means 300 ms on a good run and
+   3 s on a bad one.
+3. **Minimum dwell time.** Hold each action briefly before allowing another
+   change, so you emit commands an actuator could actually follow. Safety
+   actions must bypass this — a stop must never wait its turn.
+4. **Track-lock and ID switches.** YOLO track IDs are not stable. When the ID
+   you were following vanishes and a new one appears, a naive policy silently
+   starts following a different person. Lock on, notice the loss, and require
+   the replacement to be stable before adopting it.
+
+**Deliverables:**
+
+1. `actions.csv` **before and after** the safety layer, from the same video
+2. **Action changes per second** for both. The drop should be dramatic
+3. The watchdog demonstrated: a segment where the object is occluded or leaves
+   frame, showing the naive policy still issuing steering commands and the
+   guarded one falling back to a safe action
+4. Your chosen thresholds and timeouts, **with the reasoning**. "It looked
+   right" is not reasoning; relate them to your D1 numbers
+
+---
+
+## **D4 — Degraded input (required)**
+
+Generate degraded versions of your own video and rerun the whole pipeline on
+each:
+
+```
+python examples/degrade_video.py your_video.mp4 --all
+```
+
+You get low-light, motion blur, occlusion, heavy compression, and a frozen-feed
+variant. Report **per condition**:
+
+| condition | detection rate | ID switches | mean confidence | what the policy did | did the D3 watchdog engage? |
+| --- | --- | --- | --- | --- | --- |
+
+Then answer the question that matters:
+
+> **Which failure mode is more dangerous — a detector that returns nothing, or
+> one that returns a confident wrong box?**
+
+One of those your watchdog handles cleanly. The other one it cannot see at all,
+because a confidently wrong detection looks exactly like a good one from the
+policy's side. Say what you would do about it.
+
+---
+
+## **D5 — Write-up (required)**
+
+In your README, in your own words:
+
+1. Your p50 and p99 end-to-end latency. Why does a robot care more about the
+   tail than the average?
+2. Unbounded queue vs drop-oldest. Relate it to the C2 memory leak — what is
+   the general rule that covers both?
+3. Your policy acted on data that was N ms old. At a plausible robot speed
+   (say 0.5 m/s), how far did the world move in that time? What does that mean
+   for the thresholds you chose in D3?
+4. Why must the staleness watchdog be measured in seconds rather than frames?
+5. A wrong detection at 0.9 confidence is more dangerous than no detection at
+   all. Why — and what, if anything, can the policy do about it?
+
+---
+
+# **6. Documentation (README.md Requirements)**
 
 Your README must clearly explain:
 
@@ -391,7 +568,7 @@ Commands, examples, environment setup, etc.
 * Left/right decision
 * Trend detection (approaching/moving away)
 
-### ✔ (Tier 2) Robot policy explanation
+### ✔ Robot policy explanation
 
 * What task you chose
 * What each action means
@@ -403,6 +580,14 @@ Commands, examples, environment setup, etc.
 * VRAM lifecycle screenshots (allocated / reserved / `nvidia-smi`, before & after `empty_cache()`)
 * Answers to the C4 questions
 
+### ✔ Real-time behaviour and policy safety (Part D)
+
+* Latency table: p50 / p95 / p99 / max per stage, and the age of the data your
+  policy acted on
+* The two-curve plot: data age, queued vs drop-oldest
+* Action changes per second, before and after the safety layer
+* The degraded-input table, and your answer on which failure mode is worse
+
 ### ✔ Example outputs
 
 * Plots
@@ -411,7 +596,7 @@ Commands, examples, environment setup, etc.
 
 ---
 
-# **6. Required Demo Video (4–8 Minutes)**
+# **7. Required Demo Video (6–10 Minutes)**
 
 Your demo video must:
 
@@ -443,15 +628,24 @@ You must show:
 * Live: `torch.cuda.empty_cache()` with `nvidia-smi` visible side by side, showing reserved memory being handed back
 * The mid-run OOM being caught and recovered from (C3.4)
 
-### E. Discuss challenges you faced
+### E. Show the real-time work (Part D)
 
-### F. Explain what you learned
+* Your latency table, and say which stage dominates
+* The queued-vs-dropped age plot, and what the climbing curve means
+* **Live: the policy during an occlusion.** Show the naive version still issuing
+  steering commands with nothing detected, and the guarded version falling back
+  to a safe action
+* One degraded-video condition running, and what broke
+
+### F. Discuss challenges you faced
+
+### G. Explain what you learned
 
 This proves you personally understand the materials — even if you used AI tools for help.
 
 ---
 
-# **7. Allowed & Not Allowed Resources**
+# **8. Allowed & Not Allowed Resources**
 
 ### **Allowed**
 
@@ -467,19 +661,35 @@ This proves you personally understand the materials — even if you used AI tool
 
 ---
 
-# **8. Grading Rubric**
+# **9. Grading Rubric**
 
 | Category                     | Points |
 | ---------------------------- | ------ |
-| YOLO Tracking Implementation | 30     |
-| Object Relations Computation | 30     |
+| YOLO Tracking Implementation | 25     |
+| Object Relations Computation | 25     |
+| Robot Policy (required at this grade) | 15 |
 | Plots & Data Outputs         | 10     |
 | C1: In-app memory telemetry  | 10     |
 | C2: Leak experiments (stream=True, references) | 10 |
 | C3: VRAM lifecycle + OOM recovery | 10 |
 | C4: Memory write-up          | 5      |
+| D1: Latency budget (percentiles, data age) | 10 |
+| D2: Frame dropping vs queueing | 15   |
+| D3: Policy safety (deadband, watchdog, dwell, track lock) | 15 |
+| D4: Degraded input           | 10     |
+| D5: Real-time write-up       | 5      |
 | Documentation (README.md)    | 15     |
 | Demo Video                   | 15     |
-| **Tier 2 Extra Credit**      | +10    |
+| **Extra Credit (see below)** | +25    |
 
-Maximum: **135 (+10 bonus)**
+Maximum: **195 (+25 bonus)**
+
+## **Extra Credit (optional)**
+
+The robot policy is required at this grade, so the bonus moves up a level:
+
+| | Points | |
+| --- | --- | --- |
+| **Closed-loop simulation** | +15 | Feed the policy's action back into the pipeline — move a crop window over the frame as though the camera were on the robot. Errors now compound instead of being corrected by the next frame, which is the real test of whether your policy is stable. Show a run where it holds the target and a run where it loses it. |
+| **Export and quantize** | +12 | Export to ONNX (or TensorRT / OpenVINO), rerun D1, and put the latency tables side by side. Report the accuracy you traded for the speed — measured, not assumed. |
+| **Ground-truth evaluation** | +10 | Hand-label ~100 frames. Report precision, recall and ID switches against your labels rather than against your impression of the output. |

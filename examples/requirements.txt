@@ -10,3 +10,8 @@ numpy            # yolo_track_starter.py, vram_vs_ram_demo.py
 matplotlib       # README: distance-vs-frame + memory plots
 psutil           # mem_monitor.py — process RSS
 torch            # vram_vs_ram_demo.py — the CUDA/VRAM acts (C3)
+
+# The D-series starters (latency_probe, realtime_loop, policy_safety) need
+# NOTHING beyond the standard library — that is deliberate, so you can run
+# them before any of the above is installed. degrade_video.py uses the
+# opencv-python and numpy already listed.
