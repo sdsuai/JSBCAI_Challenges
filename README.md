@@ -1,3 +1,5 @@
+Valentino Farre
+
 # LLM-RAG-WebUI-integration Grade 1
 
 ## Important note
