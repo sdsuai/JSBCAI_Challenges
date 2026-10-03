@@ -1,0 +1,47 @@
+* PWM motor-drive starter (Task 4 mechanics)
+* Low-side NMOS switch, motor modeled as R+L, flyback diode, 0 V "ammeter".
+* Run headless:    ngspice -b pwm_motor.cir
+*
+* Starter values: 12 V pack, 10 ohm + 2 mH motor, 10 kHz, 40 % duty.
+* The assignment uses a different battery/motor/frequency/duties -- adapt.
+
+Vbat vbat 0 12
+
+* Motor model: winding resistance + inductance in series.
+* (Ignores back-EMF, i.e. this is a stalled rotor.)
+* Motor current: ngspice plots/measures it as lm#branch;
+* LTspice/KiCad users just probe the inductor current.
+Rm vbat mid 10
+Lm mid  d   2m
+
+* Flyback diode: gives the inductor current somewhere to go at switch-off.
+* Comment it out for the Task-4 spike experiment.
+Dfly d vbat DFLY
+
+* Low-side switch + gate drive: 10 kHz period (100u), on for 40u = 40 % duty.
+M1 d g 0 0 SWNMOS
+Vg g 0 PULSE(0 5 0 50n 50n 40u 100u)
+
+* Real MOSFETs have ~100 pF of output capacitance on the drain. Keep it:
+* it lets hard switching edges converge, and in the no-diode experiment it
+* turns "simulator blows up" into a visible RING you can measure.
+Cds d 0 100p
+
+* CJO/TT give the diode its real junction capacitance and recovery time --
+* remove them and the hard switching edge won't converge (try it).
+.model DFLY   D(IS=1e-12 N=1.05 CJO=50p TT=10n)
+.model SWNMOS NMOS(VTO=2 KP=2)   ; crude logic-level switch
+
+.control
+tran 0.2u 20m
+* Measure over the last 10 ms = steady state.
+meas tran i_avg  AVG lm#branch from=10m to=20m
+meas tran i_pp   PP  lm#branch from=10m to=20m
+meas tran vd_max MAX v(d)      from=10m to=20m
+echo "hand math says: i_avg ~ D*V/R = 0.48 A,  i_pp ~ V*D*(1-D)/(L*f) = 0.144 A"
+echo "(i_avg comes out a bit lower - the diode drop during t_off is not in"
+echo " the hand math. Can you refine the formula to predict what you measured?)"
+wrdata pwm_tran.txt v(d) lm#branch
+echo "pwm_tran.txt written - drain voltage and motor current vs time"
+.endc
+.end
